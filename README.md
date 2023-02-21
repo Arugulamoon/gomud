@@ -1,5 +1,15 @@
 # gomud
 
+## Server Terminal
+```bash
+go run main.go
+```
+
+## Client Terminal
+```bash
+telnet localhost 8080
+```
+
 AI/NPCs also have session
 
 ## Models
