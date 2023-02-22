@@ -21,6 +21,7 @@ func (w *World) Init() {
 					RoomId: "B",
 				},
 			},
+			Sessions: make(map[string]*Session),
 		},
 		{
 			Id:   "B",
@@ -31,6 +32,7 @@ func (w *World) Init() {
 					RoomId: "A",
 				},
 			},
+			Sessions: make(map[string]*Session),
 		},
 	}
 }
@@ -70,8 +72,8 @@ func (w *World) HandleCharacterInput(s *Session, input string) {
 
 	s.WriteLine(fmt.Sprintf("You said, \"%s\"", input))
 
-	for _, other := range s.User.Character.Room.Sessions {
-		if other.SessionId() != s.SessionId() {
+	for id, other := range s.User.Character.Room.Sessions {
+		if id != s.Id {
 			other.WriteLine(fmt.Sprintf("%s said, \"%s\"", s.User.Character.Name, input))
 		}
 	}
