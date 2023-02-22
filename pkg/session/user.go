@@ -16,7 +16,6 @@ func (e *Entity) EntityId() string {
 
 // User
 type User struct {
-	Session   *Session
 	Character *Character
 }
 
@@ -27,10 +26,5 @@ func GenerateName() string {
 // Character
 type Character struct {
 	Name string
-	User *User
 	Room *Room
-}
-
-func (c *Character) SendMessage(msg string) {
-	c.User.Session.WriteLine(msg)
 }

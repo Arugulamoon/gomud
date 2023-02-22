@@ -3,39 +3,41 @@ package session
 import "fmt"
 
 type Room struct {
-	Id, Desc   string
-	Links      []*RoomLink
-	Characters []*Character // TODO: Change to map
+	Id, Desc string
+	Links    []*RoomLink
+	Sessions []*Session // TODO: Change to map
 }
 
 func (r *Room) SendMessage(character *Character, msg string) {
-	for _, other := range r.Characters {
-		if other != character {
-			other.SendMessage(msg)
+	for _, other := range r.Sessions {
+		if other.User.Character != character {
+			other.WriteLine(msg)
 		}
 	}
 }
 
-func (r *Room) AddCharacter(character *Character) {
-	r.Characters = append(r.Characters, character)
-	character.Room = r
+func (r *Room) AddCharacter(s *Session) {
+	r.Sessions = append(r.Sessions, s)
+	s.User.Character.Room = r
 
-	r.SendMessage(character, fmt.Sprintf("%s entered the room.", character.Name))
+	r.SendMessage(s.User.Character,
+		fmt.Sprintf("%s entered the room.", s.User.Character.Name))
 }
 
 // TODO: Optimize?
-func (r *Room) RemoveCharacter(character *Character) {
-	character.Room = nil
+func (r *Room) RemoveCharacter(s *Session) {
+	s.User.Character.Room = nil
 
-	var characters []*Character
-	for _, c := range r.Characters {
-		if c != character {
-			characters = append(characters, c)
+	var sessions []*Session
+	for _, sess := range r.Sessions {
+		if sess.SessionId() != s.SessionId() {
+			sessions = append(sessions, sess)
 		}
 	}
-	r.Characters = characters
+	r.Sessions = sessions
 
-	r.SendMessage(character, fmt.Sprintf("%s left the room.", character.Name))
+	r.SendMessage(s.User.Character,
+		fmt.Sprintf("%s left the room.", s.User.Character.Name))
 }
 
 type RoomLink struct {

@@ -3,8 +3,7 @@ package session
 import "fmt"
 
 type World struct {
-	Characters []*Character
-	Rooms      []*Room
+	Rooms []*Room
 }
 
 func NewWorld() *World {
@@ -36,16 +35,16 @@ func (w *World) Init() {
 	}
 }
 
-func (w *World) HandleCharacterJoined(character *Character) {
-	w.Rooms[0].AddCharacter(character)
+func (w *World) HandleCharacterJoined(s *Session) {
+	w.Rooms[0].AddCharacter(s)
 
-	character.SendMessage(fmt.Sprintf("Welcome %s!", character.Name))
-	character.SendMessage("")
-	character.SendMessage(character.Room.Desc)
+	s.WriteLine(fmt.Sprintf("Welcome %s!", s.User.Character.Name))
+	s.WriteLine("")
+	s.WriteLine(s.User.Character.Room.Desc)
 }
 
-func (w *World) HandleCharacterLeft(character *Character) {
-	character.Room.RemoveCharacter(character) // Weird; char removing self from room
+func (w *World) HandleCharacterLeft(s *Session) {
+	s.User.Character.Room.RemoveCharacter(s) // Weird; char removing self from room
 }
 
 func (w *World) getRoomById(id string) *Room {
@@ -57,33 +56,33 @@ func (w *World) getRoomById(id string) *Room {
 	return nil
 }
 
-func (w *World) HandleCharacterInput(character *Character, input string) {
-	room := character.Room
+func (w *World) HandleCharacterInput(s *Session, input string) {
+	room := s.User.Character.Room
 	for _, link := range room.Links {
 		if link.Verb == input {
 			target := w.getRoomById(link.RoomId)
 			if target != nil {
-				w.MoveCharacter(character, target)
+				w.MoveCharacter(s, target)
 				return
 			}
 		}
 	}
 
-	character.SendMessage(fmt.Sprintf("You said, \"%s\"", input))
+	s.WriteLine(fmt.Sprintf("You said, \"%s\"", input))
 
-	for _, other := range character.Room.Characters {
-		if other != character {
-			other.SendMessage(fmt.Sprintf("%s said, \"%s\"", character.Name, input))
+	for _, other := range s.User.Character.Room.Sessions {
+		if other.SessionId() != s.SessionId() {
+			other.WriteLine(fmt.Sprintf("%s said, \"%s\"", s.User.Character.Name, input))
 		}
 	}
 }
 
-func (w *World) MoveCharacter(character *Character, targetRoom *Room) {
+func (w *World) MoveCharacter(s *Session, targetRoom *Room) {
 	// Update Rooms
-	currentRoom := character.Room
-	currentRoom.RemoveCharacter(character)
-	targetRoom.AddCharacter(character)
+	currentRoom := s.User.Character.Room
+	currentRoom.RemoveCharacter(s)
+	targetRoom.AddCharacter(s)
 
 	// Update Character
-	character.SendMessage(character.Room.Desc)
+	s.WriteLine(s.User.Character.Room.Desc)
 }
