@@ -13,23 +13,38 @@ func NewWorld() *World {
 func (w *World) Init() {
 	w.Rooms = []*Room{
 		{
-			Id:   "A",
-			Desc: "This is a room with a sign that has the letter A written on it.",
+			Id:   "Bedroom",
+			Desc: "You haven entered your bedroom. There is a door leading out! (type \"open door\" to leave the bedroom)",
 			Links: []*RoomLink{
 				{
-					Verb:   "east",
-					RoomId: "B",
+					Verb:   "open door",
+					RoomId: "Hallway",
 				},
 			},
 			Sessions: make(map[string]*Session),
 		},
 		{
-			Id:   "B",
-			Desc: "This is a room with a sign that has the letter B written on it.",
+			Id:   "Hallway",
+			Desc: "You have entered a hallway with doors at either end. (type \"open north door\" to enter the living room or \"open south door\" to enter the bedroom)",
 			Links: []*RoomLink{
 				{
-					Verb:   "west",
-					RoomId: "A",
+					Verb:   "open north door",
+					RoomId: "LivingRoom",
+				},
+				{
+					Verb:   "open south door",
+					RoomId: "Bedroom",
+				},
+			},
+			Sessions: make(map[string]*Session),
+		},
+		{
+			Id:   "LivingRoom",
+			Desc: "You have entered the living room. (type \"open door\" to enter the hallway)",
+			Links: []*RoomLink{
+				{
+					Verb:   "open door",
+					RoomId: "Hallway",
 				},
 			},
 			Sessions: make(map[string]*Session),
