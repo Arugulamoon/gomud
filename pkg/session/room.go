@@ -16,6 +16,15 @@ func (r *Room) SendMessage(s *Session, msg string) {
 	}
 }
 
+func (r *Room) ContainsCharacter(name string) bool {
+	for _, s := range r.Sessions {
+		if s.User.Character.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
 func (r *Room) AddCharacter(s *Session) {
 	r.Sessions[s.Id] = s
 	s.User.Character.Room = r

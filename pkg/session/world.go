@@ -1,6 +1,9 @@
 package session
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type World struct {
 	Rooms []*Room
@@ -10,14 +13,15 @@ func NewWorld() *World {
 	return &World{}
 }
 
+// TODO: Move into yaml
 func (w *World) Init() {
 	w.Rooms = []*Room{
 		{
 			Id:   "Bedroom",
-			Desc: "You haven entered your bedroom. There is a door leading out! (type \"open door\" to leave the bedroom)",
+			Desc: "You have entered your bedroom. There is a door leading out! (type \"/open door\" to leave the bedroom)",
 			Links: []*RoomLink{
 				{
-					Verb:   "open door",
+					Verb:   "/open door",
 					RoomId: "Hallway",
 				},
 			},
@@ -25,14 +29,14 @@ func (w *World) Init() {
 		},
 		{
 			Id:   "Hallway",
-			Desc: "You have entered a hallway with doors at either end. (type \"open north door\" to enter the living room or \"open south door\" to enter the bedroom)",
+			Desc: "You have entered a hallway with doors at either end. (type \"/open north door\" to enter the living room or \"/open south door\" to enter the bedroom)",
 			Links: []*RoomLink{
 				{
-					Verb:   "open north door",
+					Verb:   "/open north door",
 					RoomId: "LivingRoom",
 				},
 				{
-					Verb:   "open south door",
+					Verb:   "/open south door",
 					RoomId: "Bedroom",
 				},
 			},
@@ -40,10 +44,10 @@ func (w *World) Init() {
 		},
 		{
 			Id:   "LivingRoom",
-			Desc: "You have entered the living room. (type \"open door\" to enter the hallway)",
+			Desc: "You have entered the living room. (type \"/open door\" to enter the hallway)",
 			Links: []*RoomLink{
 				{
-					Verb:   "open door",
+					Verb:   "/open door",
 					RoomId: "Hallway",
 				},
 			},
@@ -74,22 +78,38 @@ func (w *World) getRoomById(id string) *Room {
 }
 
 func (w *World) HandleCharacterInput(s *Session, input string) {
+	subject := s.User.Character.Name
+
 	room := s.User.Character.Room
 	for _, link := range room.Links {
 		if link.Verb == input {
 			target := w.getRoomById(link.RoomId)
 			if target != nil {
+				// TODO: Change to ProcessInput
 				w.MoveCharacter(s, target)
 				return
 			}
 		}
 	}
 
-	s.WriteLine(fmt.Sprintf("You said, \"%s\"", input))
+	if input[0:1] == "/" {
+		cmd, args, hasArgs := strings.Cut(input, " ")
+		verb := cmd[1:]
+		s.WriteLine(ProcessInput(subject, verb, args, subject, hasArgs))
 
-	for id, other := range s.User.Character.Room.Sessions {
-		if id != s.Id {
-			other.WriteLine(fmt.Sprintf("%s said, \"%s\"", s.User.Character.Name, input))
+		for id, other := range s.User.Character.Room.Sessions {
+			if id != s.Id {
+				observer := other.User.Character.Name
+				other.WriteLine(ProcessInput(subject, verb, args, observer, hasArgs))
+			}
+		}
+	} else {
+		s.WriteLine(Say(subject, input, subject))
+
+		for id, other := range s.User.Character.Room.Sessions {
+			if id != s.Id {
+				other.WriteLine(Say(subject, input, other.User.Character.Name))
+			}
 		}
 	}
 }

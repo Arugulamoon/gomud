@@ -41,6 +41,7 @@ func (s *Session) SessionId() string {
 	return s.Id
 }
 
+// TODO: Make non-blocking for scaling
 func (s *Session) WriteLine(str string) error {
 	_, err := s.Connection.Write([]byte(str + "\r\n"))
 	return err
