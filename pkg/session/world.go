@@ -85,7 +85,6 @@ func (w *World) HandleCharacterInput(s *Session, input string) {
 		if link.Verb == input {
 			target := w.getRoomById(link.RoomId)
 			if target != nil {
-				// TODO: Change to ProcessInput
 				w.MoveCharacter(s, target)
 				return
 			}
