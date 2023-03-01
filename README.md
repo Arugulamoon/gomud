@@ -2,89 +2,85 @@
 
 ## Server Terminal
 ```bash
-go run main.go
+go run cmd/server/main.go
 ```
 
 ## Client Terminal
 ```bash
+go run cmd/client/main.go
+```
+
+## Alternative Client: Native Telnet 
+```bash
 telnet localhost 8080
 ```
 
-AI/NPCs also have session
+AI/NPCs also have session?
 
 ## Models
 
-Server
-- Start() error
+### Server
+- Start(chan session.SessionEvent) error
 
-SessionEvent
+### SessionEvent
 - Session *Session
 - Event   interface{}
 
-SessionCreatedEvent
+#### Event
+- SessionCreatedEvent
+- SessionDisconnectedEvent
+- SessionInputEvent
+  - Input
 
-SessionDisconnectedEvent
-
-SessionInputEvent
-- Input
-
-Session
-- Id          string
-- Connection  net.Conn
+### Session
+- Id            string
+- Connection    net.Conn
+- EventChannel  chan SessionEvent
+- User          *User
+- New(net.Conn, chan SessionEvent) *Session
 - SessionId() string
-- WriteLine() error
-- GenerateSessionId() string
+- WriteLine(string) error
+- Stream() error
 
-SessionHandler
+### SessionHandler
 - World         *World
 - EventChannel  <-chan SessionEvent
-- Users         map[string]*User
-- NewSessionHandler() *SessionHandler
+- NewSessionHandler(*World, <-chan SessionEvent) *SessionHandler
 - Start()
 
-World
-- map[string]Entity ???
+### World
 - Characters        []*Character
 - Rooms             []*Room
 - NewWorld() *World
 - Init()
-- HandleCharacterJoined()
-- HandleCharacterLeft()
-- HandleCharacterInput()
-- MoveCharacter()
+- HandleCharacterJoined(*Session)
+- HandleCharacterLeft(*Session)
+- HandleCharacterInput(*Session, string)
+- MoveCharacter(*Session, *Room)
 
-Entity
+### Entity
 - Id  string
 - EntityId() string
 
-User
-- Session   *Session
+### User
 - Character *Character
 - GenerateName() string
 - Request|AcceptSession(char Character) *Session ???
 
-Character
-- Entity ???
+### Character
 - Name  string
-- User  *User
 - Room  *Room
-- SendMessage()
 
-Room
-- Entity      ???
-- []Entity    ???
+### Room
 - Id          string
 - Description string
-- RoomLinks   []*RoomLink
-- Characters  []*Character
-- SendMessage()
-- AddCharacter()
-- RemoveCharacter()
+- Links       []*RoomLink
+- Sessions    []*Session
+- SendMessage(*Session, string)
+- ContainsCharacter(string)
+- AddCharacter(*Session)
+- RemoveCharacter(*Session)
 
-RoomLink
+### RoomLink
 - Verb    string
 - RoomId  string
-
-
-Indexes
-- Session -> User

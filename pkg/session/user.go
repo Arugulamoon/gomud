@@ -5,6 +5,7 @@ import (
 	"math/rand"
 )
 
+// TODO
 // Entity
 type Entity struct {
 	Id string
@@ -19,6 +20,7 @@ type User struct {
 	Character *Character
 }
 
+// TODO: Is it generate character name not User?
 func GenerateName() string {
 	return fmt.Sprintf("User %d", rand.Intn(100)+1)
 }

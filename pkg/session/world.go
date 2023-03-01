@@ -6,7 +6,8 @@ import (
 )
 
 type World struct {
-	Rooms []*Room
+	Characters []*Character // TODO
+	Rooms      []*Room
 }
 
 func NewWorld() *World {
