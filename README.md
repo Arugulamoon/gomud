@@ -84,3 +84,7 @@ AI/NPCs also have session?
 ### RoomLink
 - Verb    string
 - RoomId  string
+
+Quest: Level, Tasks, Goals, Rewards
+Currency: Gil, Tokens
+Long Walkway -> Enter Context (Room)
