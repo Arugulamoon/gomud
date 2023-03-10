@@ -7,6 +7,7 @@ import (
 type room interface {
 	Description() string
 	Characters() []*Character
+	AddCharacter(*Character)
 }
 
 type Character struct {
@@ -21,8 +22,13 @@ func New(name string, r room) *Character {
 	}
 }
 
-func (c *Character) Welcome() {
-	fmt.Printf("Hello %s!\n", c.Name)
+func (c *Character) EnterRoom() string {
+	c.Room.AddCharacter(c)
+	return c.Look()
+}
+
+func (c *Character) Welcome() string {
+	return fmt.Sprintf("Hello %s!\n", c.Name)
 }
 
 func (c *Character) Look() string {
