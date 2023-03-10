@@ -5,7 +5,7 @@ type SessionEvent struct {
 	Event   interface{}
 }
 
-type SessionCreatedEvent struct{}
+type SessionCreateEvent struct{}
 
 type SessionDisconnectEvent struct{}
 

@@ -8,15 +8,15 @@ import (
 )
 
 func main() {
-	// Create a channel to receive session events
-	ch := make(chan session.SessionEvent)
-
 	// Create and initialize world
 	w := session.NewWorld()
 	w.Init()
 
+	// Create a channel to receive session events
+	sessionEventChannel := make(chan session.SessionEvent)
+
 	// Start an async handler to react to session events
-	h := *session.NewSessionHandler(w, ch)
+	h := *session.NewSessionHandler(w, sessionEventChannel)
 	go h.Start()
 
 	// Start an async tcp server to receive connections
@@ -25,7 +25,7 @@ func main() {
 	// - Announce messages by creating message events
 	// Translate inputs into Events
 	// Disconnect connections
-	if err := server.Start(ch); err != nil {
+	if err := server.Run(sessionEventChannel); err != nil {
 		log.Fatal(err)
 	}
 }

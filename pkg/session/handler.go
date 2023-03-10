@@ -18,7 +18,7 @@ func (h *SessionHandler) Start() {
 
 		switch event := sessionEvent.Event.(type) {
 
-		case *SessionCreatedEvent:
+		case *SessionCreateEvent:
 			h.World.HandleCharacterJoined(s)
 
 		case *SessionDisconnectEvent:

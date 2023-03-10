@@ -64,6 +64,7 @@ AI/NPCs also have session?
 
 ### User
 - Character *Character
+- ADD: Session *Session
 - GenerateName() string
 - Request|AcceptSession(char Character) *Session ???
 
@@ -73,7 +74,7 @@ AI/NPCs also have session?
 
 ### Room
 - Id          string
-- Description string
+- Description string // Appearance
 - Links       []*RoomLink
 - Sessions    []*Session
 - SendMessage(*Session, string)

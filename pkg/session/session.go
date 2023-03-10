@@ -14,7 +14,7 @@ type Session struct {
 	User *User
 }
 
-func New(c net.Conn, ch chan SessionEvent) *Session {
+func NewSession(c net.Conn, ch chan SessionEvent) *Session {
 	s := &Session{
 		Id:           generateId(),
 		Connection:   c,
@@ -31,7 +31,7 @@ func New(c net.Conn, ch chan SessionEvent) *Session {
 	// Broadcast Event: Session Created (User Joined)
 	s.EventChannel <- SessionEvent{
 		Session: s,
-		Event:   &SessionCreatedEvent{},
+		Event:   &SessionCreateEvent{},
 	}
 
 	return s
@@ -47,7 +47,7 @@ func (s *Session) WriteLine(str string) error {
 	return err
 }
 
-func (s *Session) Stream() error {
+func (s *Session) Tail() error {
 	buf := make([]byte, 4096)
 	for {
 		// Broadcast user input

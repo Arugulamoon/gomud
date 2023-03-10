@@ -7,7 +7,7 @@ import (
 	"github.com/Arugulamoon/gomud/pkg/session"
 )
 
-func Start(ch chan session.SessionEvent) error {
+func Run(ch chan session.SessionEvent) error {
 	log.Println("Starting async tcp server to receive messages")
 
 	l, err := net.Listen("tcp", ":8080")
@@ -28,8 +28,8 @@ func Start(ch chan session.SessionEvent) error {
 }
 
 func handleConnection(c net.Conn, ch chan session.SessionEvent) {
-	s := session.New(c, ch)
-	if err := s.Stream(); err != nil {
+	s := session.NewSession(c, ch)
+	if err := s.Tail(); err != nil {
 		log.Println("Error handling connection", err)
 		return
 	}
