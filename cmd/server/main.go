@@ -4,19 +4,19 @@ import (
 	"log"
 
 	"github.com/Arugulamoon/gomud/pkg/server"
-	"github.com/Arugulamoon/gomud/pkg/session"
+	"github.com/Arugulamoon/gomud/pkg/world"
 )
 
 func main() {
 	// Create and initialize world
-	w := session.NewWorld()
+	w := world.NewWorld()
 	w.Init()
 
 	// Create a channel to receive session events
-	sessionEventChannel := make(chan session.SessionEvent)
+	sessionEventChannel := make(chan world.SessionEvent)
 
 	// Start an async handler to react to session events
-	h := *session.NewSessionHandler(w, sessionEventChannel)
+	h := *world.NewSessionHandler(w, sessionEventChannel)
 	go h.Start()
 
 	// Start an async tcp server to receive connections

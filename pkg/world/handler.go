@@ -1,4 +1,4 @@
-package session
+package world
 
 type SessionHandler struct {
 	World        *World
