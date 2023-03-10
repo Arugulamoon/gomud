@@ -6,13 +6,13 @@ import (
 
 type room interface {
 	Description() string
-	Characters() []*Character
+	Characters() map[string]*Character
 	AddCharacter(*Character)
 }
 
 type Character struct {
-	Name string
-	Room room
+	Id, Name string
+	Room     room
 }
 
 func New(name string, r room) *Character {
@@ -35,6 +35,6 @@ func (c *Character) Look() string {
 	return c.Room.Description()
 }
 
-func (c *Character) Who() []*Character {
+func (c *Character) Who() map[string]*Character {
 	return c.Room.Characters()
 }

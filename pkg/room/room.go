@@ -6,13 +6,13 @@ import (
 
 type Room struct {
 	Desc  string
-	Chars []*character.Character
+	Chars map[string]*character.Character
 }
 
 func New(desc string) *Room {
 	return &Room{
 		Desc:  desc,
-		Chars: make([]*character.Character, 0),
+		Chars: make(map[string]*character.Character),
 	}
 }
 
@@ -20,12 +20,12 @@ func (r *Room) Description() string {
 	return r.Desc
 }
 
-func (r *Room) Characters() []*character.Character {
+func (r *Room) Characters() map[string]*character.Character {
 	return r.Chars
 }
 
 func (r *Room) AddCharacter(c *character.Character) {
-	r.Chars = append(r.Chars, c)
+	r.Chars[c.Id] = c
 }
 
 // func (r *Room) WelcomeCharacter(name string) {
