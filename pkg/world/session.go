@@ -11,7 +11,7 @@ type Session struct {
 	Connection   net.Conn
 	EventChannel chan SessionEvent
 
-	User *User
+	Character *Character
 }
 
 func NewSession(c net.Conn, ch chan SessionEvent) *Session {
@@ -20,11 +20,7 @@ func NewSession(c net.Conn, ch chan SessionEvent) *Session {
 		Connection:   c,
 		EventChannel: ch,
 
-		User: &User{
-			Character: &Character{
-				Name: GenerateName(),
-			},
-		},
+		Character: NewCharacter(),
 	}
 	log.Println("Server accepted connection and created session:", s.SessionId())
 

@@ -3,21 +3,19 @@ package world
 import "testing"
 
 func TestContainsCharacter(t *testing.T) {
+	char1 := NewCharacter()
+	char2 := NewCharacter()
+
 	emptyRoom := Room{
 		Sessions: make(map[string]*Session),
 	}
 
-	roomWithDylan := Room{
+	roomWithChar1 := Room{
 		Sessions: make(map[string]*Session),
 	}
-	roomWithDylan.Sessions["1"] = &Session{
-		Id: "1",
-		User: &User{
-			&Character{
-				Name: "Dylan",
-				Room: &roomWithDylan,
-			},
-		},
+	roomWithChar1.Sessions["1"] = &Session{
+		Id:        "1",
+		Character: char1,
 	}
 
 	type given struct {
@@ -29,9 +27,9 @@ func TestContainsCharacter(t *testing.T) {
 		given
 		want bool
 	}{
-		{given{emptyRoom, "Dylan"}, false},
-		{given{roomWithDylan, "Deirdre"}, false},
-		{given{roomWithDylan, "Dylan"}, true},
+		{given{emptyRoom, char1.Name}, false},
+		{given{roomWithChar1, char1.Name}, true},
+		{given{roomWithChar1, char2.Name}, false},
 	}
 	for _, tt := range tests {
 		got := tt.given.room.ContainsCharacter(tt.name)

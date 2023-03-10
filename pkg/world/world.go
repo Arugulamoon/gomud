@@ -63,13 +63,13 @@ func (w *World) HandleCharacterJoined(s *Session) {
 	w.Rooms[0].AddCharacter(s)
 
 	// TODO: Move this to event driven?
-	s.WriteLine(fmt.Sprintf("Welcome %s!", s.User.Character.Name))
+	s.WriteLine(fmt.Sprintf("Welcome %s!", s.Character.Name))
 	s.WriteLine("")
-	s.WriteLine(s.User.Character.Room.Description())
+	s.WriteLine(s.Character.Room.Description())
 }
 
 func (w *World) HandleCharacterLeft(s *Session) {
-	s.User.Character.Room.RemoveCharacter(s) // Weird; char removing self from room
+	s.Character.Room.RemoveCharacter(s) // Weird; char removing self from room
 }
 
 func (w *World) getRoomById(id string) *Room {
@@ -82,9 +82,9 @@ func (w *World) getRoomById(id string) *Room {
 }
 
 func (w *World) HandleCharacterInput(s *Session, inp string) {
-	subject := s.User.Character.Name
+	subject := s.Character.Name
 
-	room := s.User.Character.Room
+	room := s.Character.Room
 	for _, link := range room.RoomLinks() {
 		if link.Verb == inp {
 			target := w.getRoomById(link.RoomId)
@@ -109,9 +109,9 @@ func (w *World) HandleCharacterInput(s *Session, inp string) {
 	} else {
 		s.WriteLine(input.ProcessInput(subject, verb, args, subject, hasArgs))
 
-		for id, other := range s.User.Character.Room.ConnectedSessions() {
+		for id, other := range s.Character.Room.ConnectedSessions() {
 			if id != s.Id {
-				observer := other.User.Character.Name
+				observer := other.Character.Name
 				other.WriteLine(input.ProcessInput(subject, verb, args, observer, hasArgs))
 			}
 		}
@@ -120,10 +120,10 @@ func (w *World) HandleCharacterInput(s *Session, inp string) {
 
 func (w *World) MoveCharacter(s *Session, targetRoom *Room) {
 	// Update Rooms
-	currentRoom := s.User.Character.Room
+	currentRoom := s.Character.Room
 	currentRoom.RemoveCharacter(s)
 	targetRoom.AddCharacter(s)
 
 	// Update Character
-	s.WriteLine(s.User.Character.Room.Description())
+	s.WriteLine(s.Character.Room.Description())
 }

@@ -30,7 +30,7 @@ func (r *Room) SendMessage(s *Session, msg string) {
 
 func (r *Room) ContainsCharacter(name string) bool {
 	for _, s := range r.Sessions {
-		if s.User.Character.Name == name {
+		if s.Character.Name == name {
 			return true
 		}
 	}
@@ -39,14 +39,14 @@ func (r *Room) ContainsCharacter(name string) bool {
 
 func (r *Room) AddCharacter(s *Session) {
 	r.Sessions[s.Id] = s
-	s.User.Character.Room = r
-	r.SendMessage(s, fmt.Sprintf("%s entered the room.", s.User.Character.Name))
+	s.Character.Room = r
+	r.SendMessage(s, fmt.Sprintf("%s entered the room.", s.Character.Name))
 }
 
 func (r *Room) RemoveCharacter(s *Session) {
 	delete(r.Sessions, s.Id)
-	s.User.Character.Room = nil
-	r.SendMessage(s, fmt.Sprintf("%s left the room.", s.User.Character.Name))
+	s.Character.Room = nil
+	r.SendMessage(s, fmt.Sprintf("%s left the room.", s.Character.Name))
 }
 
 type RoomLink struct {

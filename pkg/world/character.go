@@ -5,26 +5,6 @@ import (
 	"math/rand"
 )
 
-// TODO
-// Entity
-type Entity struct {
-	Id string
-}
-
-func (e *Entity) EntityId() string {
-	return e.Id
-}
-
-// User
-type User struct {
-	Character *Character
-}
-
-// TODO: Is it generate character name not User?
-func GenerateName() string {
-	return fmt.Sprintf("User %d", rand.Intn(100)+1)
-}
-
 type room interface {
 	Description() string
 	RoomLinks() []*RoomLink                 // TODO: Remove
@@ -37,4 +17,14 @@ type room interface {
 type Character struct {
 	Name string
 	Room room
+}
+
+func NewCharacter() *Character {
+	return &Character{
+		Name: generateName(),
+	}
+}
+
+func generateName() string {
+	return fmt.Sprintf("Character %d", rand.Intn(100)+1)
 }
