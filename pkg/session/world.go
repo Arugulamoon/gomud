@@ -3,6 +3,8 @@ package session
 import (
 	"fmt"
 	"strings"
+
+	"github.com/Arugulamoon/gomud/pkg/input"
 )
 
 type World struct {
@@ -78,12 +80,12 @@ func (w *World) getRoomById(id string) *Room {
 	return nil
 }
 
-func (w *World) HandleCharacterInput(s *Session, input string) {
+func (w *World) HandleCharacterInput(s *Session, inp string) {
 	subject := s.User.Character.Name
 
 	room := s.User.Character.Room
 	for _, link := range room.Links {
-		if link.Verb == input {
+		if link.Verb == inp {
 			target := w.getRoomById(link.RoomId)
 			if target != nil {
 				w.MoveCharacter(s, target)
@@ -93,23 +95,23 @@ func (w *World) HandleCharacterInput(s *Session, input string) {
 	}
 
 	verb := "say"
-	args := input
+	args := inp
 	hasArgs := true
-	if input[0:1] == "/" {
+	if inp[0:1] == "/" {
 		var cmd string
-		cmd, args, hasArgs = strings.Cut(input, " ")
+		cmd, args, hasArgs = strings.Cut(inp, " ")
 		verb = cmd[1:]
 	}
 
 	if verb != "say" && hasArgs && !room.ContainsCharacter(args) {
 		s.WriteLine("There is no one around with that name...")
 	} else {
-		s.WriteLine(ProcessInput(subject, verb, args, subject, hasArgs))
+		s.WriteLine(input.ProcessInput(subject, verb, args, subject, hasArgs))
 
 		for id, other := range s.User.Character.Room.Sessions {
 			if id != s.Id {
 				observer := other.User.Character.Name
-				other.WriteLine(ProcessInput(subject, verb, args, observer, hasArgs))
+				other.WriteLine(input.ProcessInput(subject, verb, args, observer, hasArgs))
 			}
 		}
 	}
