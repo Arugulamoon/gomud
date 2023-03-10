@@ -8,6 +8,18 @@ type Room struct {
 	Sessions map[string]*Session
 }
 
+func (r *Room) Description() string {
+	return r.Desc
+}
+
+func (r *Room) RoomLinks() []*RoomLink {
+	return r.Links
+}
+
+func (r *Room) ConnectedSessions() map[string]*Session {
+	return r.Sessions
+}
+
 func (r *Room) SendMessage(s *Session, msg string) {
 	for id, other := range r.Sessions {
 		if id != s.Id {
