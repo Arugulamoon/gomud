@@ -9,8 +9,8 @@ import (
 
 func main() {
 	// Create and initialize world
-	w := world.NewWorld()
-	w.Init()
+	w := world.New()
+	w.Load()
 
 	// Create a channel to receive session events
 	sessionEventChannel := make(chan world.SessionEvent)

@@ -12,12 +12,12 @@ type World struct {
 	Rooms      []*Room
 }
 
-func NewWorld() *World {
+func New() *World {
 	return &World{}
 }
 
 // TODO: Move into yaml
-func (w *World) Init() {
+func (w *World) Load() {
 	w.Rooms = []*Room{
 		{
 			Id:   "Bedroom",
