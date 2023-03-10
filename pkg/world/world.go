@@ -8,7 +8,7 @@ import (
 )
 
 type World struct {
-	Characters []*Character // TODO
+	Characters []*Character
 	Rooms      []*Room
 }
 

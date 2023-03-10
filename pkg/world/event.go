@@ -1,5 +1,7 @@
 package world
 
+// CONTEXT: Session? Server?
+
 type SessionEvent struct {
 	Session *Session
 	Event   interface{}

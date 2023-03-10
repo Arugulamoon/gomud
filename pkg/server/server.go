@@ -1,5 +1,7 @@
 package server
 
+// CONTEXT: Server
+
 import (
 	"log"
 	"net"

@@ -1,5 +1,7 @@
 package world
 
+// CONTEXT: Server? Session?
+
 import (
 	"fmt"
 	"log"

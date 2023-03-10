@@ -1,5 +1,7 @@
 package world
 
+// CONTEXT: World
+
 type SessionHandler struct {
 	World        *World
 	EventChannel <-chan SessionEvent
