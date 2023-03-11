@@ -15,21 +15,21 @@ type Character struct {
 	Room     room
 }
 
-func NewCharacter() *Character {
+func New() *Character {
 	return &Character{
-		Id:   generateCharacterId(),
-		Name: generateCharacterName(),
+		Id:   generateId(),
+		Name: generateName(),
 	}
 }
 
-var nextCharacterId = 1
+var nextId = 1
 
-func generateCharacterId() string {
-	var id = nextCharacterId
-	nextCharacterId++
+func generateId() string {
+	var id = nextId
+	nextId++
 	return fmt.Sprintf("%d", id)
 }
 
-func generateCharacterName() string {
+func generateName() string {
 	return fmt.Sprintf("Character %d", rand.Intn(100)+1)
 }

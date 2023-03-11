@@ -16,13 +16,13 @@ type Session struct {
 	Character *character.Character
 }
 
-func NewSession(c net.Conn, ch chan SessionEvent) *Session {
+func New(c net.Conn, ch chan SessionEvent) *Session {
 	s := &Session{
-		Id:           generateSessionId(),
+		Id:           generateId(),
 		Connection:   c,
 		EventChannel: ch,
 
-		Character: character.NewCharacter(),
+		Character: character.New(),
 	}
 	log.Println("Server accepted connection and created session:", s.SessionId())
 
@@ -82,10 +82,10 @@ func (s *Session) Tail() error {
 	return nil
 }
 
-var nextSessionId = 1
+var nextId = 1
 
-func generateSessionId() string {
-	var id = nextSessionId
-	nextSessionId++
+func generateId() string {
+	var id = nextId
+	nextId++
 	return fmt.Sprintf("%d", id)
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/Arugulamoon/gomud/pkg/server"
 	"github.com/Arugulamoon/gomud/pkg/session"
 	"github.com/Arugulamoon/gomud/pkg/world"
 )
@@ -25,7 +26,7 @@ func main() {
 	// - Announce messages by creating message events
 	// Translate inputs into Events
 	// Disconnect connections
-	if err := session.Run(sessionEventChannel); err != nil {
+	if err := server.Run(sessionEventChannel); err != nil {
 		log.Fatal(err)
 	}
 }
