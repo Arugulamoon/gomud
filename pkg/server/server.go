@@ -1,6 +1,7 @@
 package server
 
 import (
+	"crypto/tls"
 	"log"
 	"net"
 
@@ -10,7 +11,14 @@ import (
 func Run(ch chan session.SessionEvent) error {
 	log.Println("Starting async tcp server to receive messages")
 
-	l, err := net.Listen("tcp", ":7324")
+	cert, err := tls.LoadX509KeyPair("server.crt", "server.key")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	l, err := tls.Listen("tcp", ":7324", &tls.Config{
+		Certificates: []tls.Certificate{cert}},
+	)
 	if err != nil {
 		return err
 	}

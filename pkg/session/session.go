@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 
 	"github.com/Arugulamoon/gomud/pkg/character"
 )
@@ -65,16 +66,23 @@ func (s *Session) Tail() error {
 			break
 		}
 
-		if n > 2 {
-			msg := string(buf[0 : n-2])
-			log.Printf("Received message on session %s: \"%s\"\r\n", s.SessionId(), msg)
-
-			s.EventChannel <- SessionEvent{
-				Session: s,
-				Event: &SessionInputEvent{
-					Input: msg,
-				},
+		// May receive messages ending with \r or \r\n
+		msg := strings.Map(func(r rune) rune {
+			if r == 13 {
+				return 0
 			}
+			if r == 10 {
+				return 0
+			}
+			return r
+		}, string(buf))
+		log.Printf("Received message on session %s: %s", s.SessionId(), msg)
+
+		s.EventChannel <- SessionEvent{
+			Session: s,
+			Event: &SessionInputEvent{
+				Input: msg,
+			},
 		}
 	}
 

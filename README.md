@@ -1,5 +1,9 @@
 # gomud
 
+Quest: Level, Tasks, Goals, Rewards
+Currency: Gil, Tokens
+Long Walkway -> Enter Context (Room)
+
 ## Server Terminal
 ```bash
 go run cmd/server/main.go
@@ -10,82 +14,58 @@ go run cmd/server/main.go
 go run cmd/client/main.go
 ```
 
-## Alternative Client: Native Telnet 
+## Alternative Client Terminal
 ```bash
-telnet localhost 8080
+openssl s_client -connect localhost:7324
 ```
 
-AI/NPCs also have session?
+## Prototyping Terminal
+```bash
+go run cmd/prototype/main.go
+```
 
-## Models
+## Generate Self-Signed SSL Certificate
 
-### Server
-- Start(chan session.SessionEvent) error
+### You must have a CA
+```bash
+openssl genrsa -out ca.key 2048
+openssl req \
+  -new \
+  -x509 \
+  -days 3650 \
+  -key ca.key \
+  -subj "/C=CA/ST=ON/L=Ottawa/O=Eden-Walker/CN=Eden-Walker Root CA" \
+  -out ca.crt
+```
 
-### SessionEvent
-- Session *Session
-- Event   interface{}
+### Create a server CSR with 'localhost' in CN
+```bash
+openssl req \
+  -newkey rsa:2048 \
+  -nodes \
+  -keyout server.key \
+  -subj "/C=CA/ST=ON/L=Ottawa/O=Eden-Walker/CN=localhost" \
+  -out server.csr
+```
 
-#### Event
-- SessionCreatedEvent
-- SessionDisconnectedEvent
-- SessionInputEvent
-  - Input
+### Finally sign server cert by CA and pass the subjectAltName when you signing server cert
+```bash
+openssl x509 \
+  -req \
+  -extfile <(printf "subjectAltName=DNS:localhost") \
+  -days 3650 \
+  -in server.csr \
+  -CA ca.crt \
+  -CAkey ca.key \
+  -CAcreateserial \
+  -out server.crt
+```
 
-### Session
-- Id            string
-- Connection    net.Conn
-- EventChannel  chan SessionEvent
-- User          *User
-- New(net.Conn, chan SessionEvent) *Session
-- SessionId() string
-- WriteLine(string) error
-- Stream() error
-
-### SessionHandler
-- World         *World
-- EventChannel  <-chan SessionEvent
-- NewSessionHandler(*World, <-chan SessionEvent) *SessionHandler
-- Start()
-
-### World
-- Characters        []*Character
-- Rooms             []*Room
-- NewWorld() *World
-- Init()
-- HandleCharacterJoined(*Session)
-- HandleCharacterLeft(*Session)
-- HandleCharacterInput(*Session, string)
-- MoveCharacter(*Session, *Room)
-
-### Entity
-- Id  string
-- EntityId() string
-
-### User
-- Character *Character
-- ADD: Session *Session
-- GenerateName() string
-- Request|AcceptSession(char Character) *Session ???
-
-### Character
-- Name  string
-- Room  *Room
-
-### Room
-- Id          string
-- Description string // Appearance
-- Links       []*RoomLink
-- Sessions    []*Session
-- SendMessage(*Session, string)
-- ContainsCharacter(string)
-- AddCharacter(*Session)
-- RemoveCharacter(*Session)
-
-### RoomLink
-- Verb    string
-- RoomId  string
-
-Quest: Level, Tasks, Goals, Rewards
-Currency: Gil, Tokens
-Long Walkway -> Enter Context (Room)
+### References:
+* https://github.com/shuklalok/Mywork/tree/master/tls
+* https://gist.github.com/denji/12b3a568f092ab951456
+* https://superuser.com/questions/346958/can-the-telnet-or-netcat-clients-communicate-over-ssl
+* https://eli.thegreenplace.net/2021/go-https-servers-with-tls/
+* https://eli.thegreenplace.net/2021/go-socket-servers-with-tls/
+* https://dev.to/hgsgtk/how-go-handles-network-and-system-calls-when-tcp-server-1nbd
+* https://github.com/reiver/go-telnet
