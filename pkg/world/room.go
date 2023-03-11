@@ -32,7 +32,7 @@ func (r *Room) GetCharacters() map[string]*character.Character {
 func (r *Room) SendMessage(s *session.Session, msg string) {
 	for id, other := range r.Characters {
 		if id != s.Character.Id {
-			other.Session.WriteLine(msg)
+			other.SendMessage(msg)
 		}
 	}
 }

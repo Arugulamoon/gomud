@@ -119,7 +119,7 @@ func (w *World) HandleCharacterInput(s *session.Session, inp string) {
 		for id, other := range room.GetCharacters() {
 			if id != s.Character.Id {
 				observer := other.Name
-				other.Session.WriteLine(input.ProcessInput(subject, verb, args, observer, hasArgs))
+				other.SendMessage(input.ProcessInput(subject, verb, args, observer, hasArgs))
 			}
 		}
 	}

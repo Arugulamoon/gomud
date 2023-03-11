@@ -6,7 +6,7 @@ import (
 )
 
 type session interface {
-	WriteLine(str string) error
+	WriteLine(msg string) error
 }
 
 type room interface {
@@ -26,6 +26,10 @@ func New(s session) *Character {
 		Name:    generateName(),
 		Session: s,
 	}
+}
+
+func (c *Character) SendMessage(msg string) {
+	c.Session.WriteLine(msg)
 }
 
 var nextId = 1
