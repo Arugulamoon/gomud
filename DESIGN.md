@@ -1,13 +1,13 @@
 World
 
-SessionHandler
+World: SessionHandler
 - listens for session events (connect, disconnect, input)
 - performs actions on world based on events, for example:
   - Add/Remove Characters from rooms
   - Move Characters from one room to another
-  - Message the room (and other characters in the room)
+  - Message Characters in the room
 
-Server
+Server: ConnectionHandler
 - listens for client connections
 - upon accepting connection, creates thread to:
   - create a session

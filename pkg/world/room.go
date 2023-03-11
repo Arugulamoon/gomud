@@ -3,9 +3,10 @@ package world
 import "fmt"
 
 type Room struct {
-	Id, Desc string
-	Links    []*RoomLink
-	Sessions map[string]*Session
+	Id, Desc   string
+	Links      []*RoomLink
+	Sessions   map[string]*Session
+	Characters map[string]*Character
 }
 
 func (r *Room) Description() string {

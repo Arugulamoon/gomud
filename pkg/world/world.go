@@ -8,7 +8,7 @@ import (
 )
 
 type World struct {
-	Characters []*Character
+	Characters map[string]*Character
 	Rooms      []*Room
 }
 
@@ -60,16 +60,17 @@ func (w *World) Load() {
 }
 
 func (w *World) HandleCharacterJoined(s *Session) {
+	w.Characters[s.Character.Id] = s.Character
 	w.Rooms[0].AddCharacter(s)
 
-	// TODO: Move this to event driven?
 	s.WriteLine(fmt.Sprintf("Welcome %s!", s.Character.Name))
 	s.WriteLine("")
 	s.WriteLine(s.Character.Room.Description())
 }
 
 func (w *World) HandleCharacterLeft(s *Session) {
-	s.Character.Room.RemoveCharacter(s) // Weird; char removing self from room
+	s.Character.Room.RemoveCharacter(s)
+	delete(w.Characters, s.Character.Id)
 }
 
 func (w *World) getRoomById(id string) *Room {

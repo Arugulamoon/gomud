@@ -15,16 +15,25 @@ type room interface {
 
 // Character
 type Character struct {
-	Name string
-	Room room
+	Id, Name string
+	Room     room
 }
 
 func NewCharacter() *Character {
 	return &Character{
-		Name: generateName(),
+		Id:   generateCharacterId(),
+		Name: generateCharacterName(),
 	}
 }
 
-func generateName() string {
+var nextCharacterId = 1
+
+func generateCharacterId() string {
+	var id = nextCharacterId
+	nextCharacterId++
+	return fmt.Sprintf("%d", id)
+}
+
+func generateCharacterName() string {
 	return fmt.Sprintf("Character %d", rand.Intn(100)+1)
 }

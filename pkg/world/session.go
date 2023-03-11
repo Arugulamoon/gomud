@@ -18,7 +18,7 @@ type Session struct {
 
 func NewSession(c net.Conn, ch chan SessionEvent) *Session {
 	s := &Session{
-		Id:           generateId(),
+		Id:           generateSessionId(),
 		Connection:   c,
 		EventChannel: ch,
 
@@ -82,10 +82,10 @@ func (s *Session) Tail() error {
 	return nil
 }
 
-var nextId = 1
+var nextSessionId = 1
 
-func generateId() string {
-	var sId = nextId
-	nextId++
-	return fmt.Sprintf("%d", sId)
+func generateSessionId() string {
+	var id = nextSessionId
+	nextSessionId++
+	return fmt.Sprintf("%d", id)
 }
