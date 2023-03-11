@@ -10,7 +10,6 @@ import (
 type Room struct {
 	Id, Description string
 	Links           []*RoomLink
-	Sessions        map[string]*session.Session
 	Characters      map[string]*character.Character
 }
 
@@ -26,14 +25,14 @@ func (r *Room) RoomLinks() []*RoomLink {
 	return r.Links
 }
 
-func (r *Room) ConnectedSessions() map[string]*session.Session {
-	return r.Sessions
+func (r *Room) GetCharacters() map[string]*character.Character {
+	return r.Characters
 }
 
 func (r *Room) SendMessage(s *session.Session, msg string) {
-	for id, other := range r.Sessions {
-		if id != s.Id {
-			other.WriteLine(msg)
+	for id, other := range r.Characters {
+		if id != s.Character.Id {
+			other.Session.WriteLine(msg)
 		}
 	}
 }
@@ -49,13 +48,12 @@ func (r *Room) ContainsCharacter(name string) bool {
 
 func (r *Room) AddCharacter(s *session.Session) {
 	r.Characters[s.Character.Id] = s.Character
-	r.Sessions[s.Id] = s
 	s.Character.Room = r
 	r.SendMessage(s, fmt.Sprintf("%s entered the room.", s.Character.Name))
 }
 
 func (r *Room) RemoveCharacter(s *session.Session) {
-	delete(r.Sessions, s.Id)
+	delete(r.Characters, s.Character.Id)
 	s.Character.Room = nil
 	r.SendMessage(s, fmt.Sprintf("%s left the room.", s.Character.Name))
 }

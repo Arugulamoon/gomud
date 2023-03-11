@@ -5,6 +5,10 @@ import (
 	"math/rand"
 )
 
+type session interface {
+	WriteLine(str string) error
+}
+
 type room interface {
 	GetId() string
 	GetDescription() string
@@ -12,13 +16,15 @@ type room interface {
 
 type Character struct {
 	Id, Name string
+	Session  session
 	Room     room
 }
 
-func New() *Character {
+func New(s session) *Character {
 	return &Character{
-		Id:   generateId(),
-		Name: generateName(),
+		Id:      generateId(),
+		Name:    generateName(),
+		Session: s,
 	}
 }
 

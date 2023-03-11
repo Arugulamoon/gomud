@@ -21,9 +21,8 @@ func New(c net.Conn, ch chan SessionEvent) *Session {
 		Id:           generateId(),
 		Connection:   c,
 		EventChannel: ch,
-
-		Character: character.New(),
 	}
+	s.Character = character.New(s)
 	log.Println("Server accepted connection and created session:", s.SessionId())
 
 	// Broadcast Event: Session Created (User Joined)

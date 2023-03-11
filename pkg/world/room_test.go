@@ -8,21 +8,15 @@ import (
 )
 
 func TestContainsCharacter(t *testing.T) {
-	char1 := character.New()
-	char2 := character.New()
+	char1 := character.New(&session.Session{})
+	char2 := character.New(&session.Session{})
 
 	emptyRoom := Room{
-		Sessions:   make(map[string]*session.Session),
 		Characters: make(map[string]*character.Character),
 	}
 
 	roomWithChar1 := Room{
-		Sessions:   make(map[string]*session.Session),
 		Characters: make(map[string]*character.Character),
-	}
-	roomWithChar1.Sessions["1"] = &session.Session{
-		Id:        "1",
-		Character: char1,
 	}
 	roomWithChar1.Characters["1"] = char1
 

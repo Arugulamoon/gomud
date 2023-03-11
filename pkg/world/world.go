@@ -32,7 +32,6 @@ func (w *World) Load() {
 					RoomId: "Hallway",
 				},
 			},
-			Sessions:   make(map[string]*session.Session),
 			Characters: make(map[string]*character.Character),
 		},
 		"Hallway": {
@@ -48,7 +47,6 @@ func (w *World) Load() {
 					RoomId: "Bedroom",
 				},
 			},
-			Sessions:   make(map[string]*session.Session),
 			Characters: make(map[string]*character.Character),
 		},
 		"LivingRoom": {
@@ -60,7 +58,6 @@ func (w *World) Load() {
 					RoomId: "Hallway",
 				},
 			},
-			Sessions:   make(map[string]*session.Session),
 			Characters: make(map[string]*character.Character),
 		},
 	}
@@ -119,10 +116,10 @@ func (w *World) HandleCharacterInput(s *session.Session, inp string) {
 	} else {
 		s.WriteLine(input.ProcessInput(subject, verb, args, subject, hasArgs))
 
-		for id, other := range room.ConnectedSessions() {
-			if id != s.Id {
-				observer := other.Character.Name
-				other.WriteLine(input.ProcessInput(subject, verb, args, observer, hasArgs))
+		for id, other := range room.GetCharacters() {
+			if id != s.Character.Id {
+				observer := other.Name
+				other.Session.WriteLine(input.ProcessInput(subject, verb, args, observer, hasArgs))
 			}
 		}
 	}
