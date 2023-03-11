@@ -7,5 +7,5 @@ import (
 func main() {
 	var caller telnet.Caller = telnet.StandardCaller
 
-	telnet.DialToAndCall("localhost:8080", caller)
+	telnet.DialToAndCall("localhost:7324", caller)
 }

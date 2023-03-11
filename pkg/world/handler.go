@@ -16,18 +16,18 @@ func NewSessionHandler(w *World, ch <-chan session.SessionEvent) *SessionHandler
 
 func (h *SessionHandler) Start() {
 	for sessionEvent := range h.EventChannel {
-		s := sessionEvent.Session
+		c := sessionEvent.Session.Character
 
 		switch event := sessionEvent.Event.(type) {
 
 		case *session.SessionCreateEvent:
-			h.World.HandleCharacterJoined(s)
+			h.World.HandleCharacterJoined(c)
 
 		case *session.SessionDisconnectEvent:
-			h.World.HandleCharacterLeft(s)
+			h.World.HandleCharacterLeft(c)
 
 		case *session.SessionInputEvent:
-			h.World.HandleCharacterInput(s, event.Input)
+			h.World.HandleCharacterInput(c, event.Input)
 		}
 	}
 }

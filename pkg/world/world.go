@@ -6,7 +6,6 @@ import (
 
 	"github.com/Arugulamoon/gomud/pkg/character"
 	"github.com/Arugulamoon/gomud/pkg/input"
-	"github.com/Arugulamoon/gomud/pkg/session"
 )
 
 type World struct {
@@ -63,19 +62,19 @@ func (w *World) Load() {
 	}
 }
 
-func (w *World) HandleCharacterJoined(s *session.Session) {
-	w.Characters[s.Character.Id] = s.Character
-	w.Rooms["Bedroom"].AddCharacter(s)
+func (w *World) HandleCharacterJoined(c *character.Character) {
+	w.Characters[c.Id] = c
+	w.Rooms["Bedroom"].AddCharacter(c)
 
-	s.WriteLine(fmt.Sprintf("Welcome %s!", s.Character.Name))
-	s.WriteLine("")
-	s.WriteLine(s.Character.Room.GetDescription())
+	c.SendMessage(fmt.Sprintf("Welcome %s!", c.Name))
+	c.SendMessage("")
+	c.SendMessage(c.Room.GetDescription())
 }
 
-func (w *World) HandleCharacterLeft(s *session.Session) {
-	room := w.Rooms[s.Character.Room.GetId()]
-	room.RemoveCharacter(s)
-	delete(w.Characters, s.Character.Id)
+func (w *World) HandleCharacterLeft(c *character.Character) {
+	room := w.Rooms[c.Room.GetId()]
+	room.RemoveCharacter(c)
+	delete(w.Characters, c.Id)
 }
 
 func (w *World) getRoomById(id string) *Room {
@@ -87,16 +86,16 @@ func (w *World) getRoomById(id string) *Room {
 	return nil
 }
 
-func (w *World) HandleCharacterInput(s *session.Session, inp string) {
-	subject := s.Character.Name
+func (w *World) HandleCharacterInput(c *character.Character, inp string) {
+	subject := c.Name
 
-	roomId := s.Character.Room.GetId()
+	roomId := c.Room.GetId()
 	room := w.Rooms[roomId]
 	for _, link := range room.RoomLinks() {
 		if link.Verb == inp {
 			target := w.getRoomById(link.RoomId)
 			if target != nil {
-				w.MoveCharacter(s, target)
+				w.MoveCharacter(c, target)
 				return
 			}
 		}
@@ -112,12 +111,12 @@ func (w *World) HandleCharacterInput(s *session.Session, inp string) {
 	}
 
 	if verb != "say" && hasArgs && !room.ContainsCharacter(args) {
-		s.WriteLine("There is no one around with that name...")
+		c.SendMessage("There is no one around with that name...")
 	} else {
-		s.WriteLine(input.ProcessInput(subject, verb, args, subject, hasArgs))
+		c.SendMessage(input.ProcessInput(subject, verb, args, subject, hasArgs))
 
 		for id, other := range room.GetCharacters() {
-			if id != s.Character.Id {
+			if id != c.Id {
 				observer := other.Name
 				other.SendMessage(input.ProcessInput(subject, verb, args, observer, hasArgs))
 			}
@@ -125,12 +124,12 @@ func (w *World) HandleCharacterInput(s *session.Session, inp string) {
 	}
 }
 
-func (w *World) MoveCharacter(s *session.Session, targetRoom *Room) {
+func (w *World) MoveCharacter(c *character.Character, targetRoom *Room) {
 	// Update Rooms
-	currentRoom := w.Rooms[s.Character.Room.GetId()]
-	currentRoom.RemoveCharacter(s)
-	targetRoom.AddCharacter(s)
+	currentRoom := w.Rooms[c.Room.GetId()]
+	currentRoom.RemoveCharacter(c)
+	targetRoom.AddCharacter(c)
 
 	// Update Character
-	s.WriteLine(s.Character.Room.GetDescription())
+	c.SendMessage(c.Room.GetDescription())
 }

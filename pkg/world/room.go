@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Arugulamoon/gomud/pkg/character"
-	"github.com/Arugulamoon/gomud/pkg/session"
 )
 
 type Room struct {
@@ -29,9 +28,9 @@ func (r *Room) GetCharacters() map[string]*character.Character {
 	return r.Characters
 }
 
-func (r *Room) SendMessage(s *session.Session, msg string) {
+func (r *Room) SendMessage(c *character.Character, msg string) {
 	for id, other := range r.Characters {
-		if id != s.Character.Id {
+		if id != c.Id {
 			other.SendMessage(msg)
 		}
 	}
@@ -46,16 +45,16 @@ func (r *Room) ContainsCharacter(name string) bool {
 	return false
 }
 
-func (r *Room) AddCharacter(s *session.Session) {
-	r.Characters[s.Character.Id] = s.Character
-	s.Character.Room = r
-	r.SendMessage(s, fmt.Sprintf("%s entered the room.", s.Character.Name))
+func (r *Room) AddCharacter(c *character.Character) {
+	r.Characters[c.Id] = c
+	c.Room = r
+	r.SendMessage(c, fmt.Sprintf("%s entered the room.", c.Name))
 }
 
-func (r *Room) RemoveCharacter(s *session.Session) {
-	delete(r.Characters, s.Character.Id)
-	s.Character.Room = nil
-	r.SendMessage(s, fmt.Sprintf("%s left the room.", s.Character.Name))
+func (r *Room) RemoveCharacter(c *character.Character) {
+	delete(r.Characters, c.Id)
+	c.Room = nil
+	r.SendMessage(c, fmt.Sprintf("%s left the room.", c.Name))
 }
 
 type RoomLink struct {

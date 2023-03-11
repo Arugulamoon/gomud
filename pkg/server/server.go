@@ -10,7 +10,7 @@ import (
 func Run(ch chan session.SessionEvent) error {
 	log.Println("Starting async tcp server to receive messages")
 
-	l, err := net.Listen("tcp", ":8080")
+	l, err := net.Listen("tcp", ":7324")
 	if err != nil {
 		return err
 	}
