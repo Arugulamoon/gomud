@@ -67,6 +67,9 @@ func (s *Session) Tail() error {
 		}
 
 		// May receive messages ending with \r or \r\n
+		// References:
+		// * https://stackoverflow.com/questions/65195938/how-to-convert-a-string-to-rune
+		// * https://codereview.appspot.com/5495049/patch/2003/1004
 		msg := strings.Map(func(r rune) rune {
 			if r == 13 {
 				return 0
