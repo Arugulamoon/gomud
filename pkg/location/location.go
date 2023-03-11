@@ -4,31 +4,31 @@ import (
 	"github.com/Arugulamoon/gomud/pkg/avatar"
 )
 
-type Room struct {
+type Location struct {
 	Desc  string
 	Chars map[string]*avatar.Avatar
 }
 
-func New(desc string) *Room {
-	return &Room{
+func New(desc string) *Location {
+	return &Location{
 		Desc:  desc,
 		Chars: make(map[string]*avatar.Avatar),
 	}
 }
 
-func (r *Room) Description() string {
+func (r *Location) Description() string {
 	return r.Desc
 }
 
-func (r *Room) Avatars() map[string]*avatar.Avatar {
+func (r *Location) Avatars() map[string]*avatar.Avatar {
 	return r.Chars
 }
 
-func (r *Room) AddAvatar(c *avatar.Avatar) {
+func (r *Location) AddAvatar(c *avatar.Avatar) {
 	r.Chars[c.Id] = c
 }
 
-// func (r *Room) WelcomeAvatar(name string) {
+// func (r *Location) WelcomeAvatar(name string) {
 // 	a := avatar.New(name, r)
 // 	a.Welcome()
 // }
