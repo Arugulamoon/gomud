@@ -1,15 +1,11 @@
-package server
-
-// CONTEXT: Server
+package session
 
 import (
 	"log"
 	"net"
-
-	"github.com/Arugulamoon/gomud/pkg/world"
 )
 
-func Run(ch chan world.SessionEvent) error {
+func Run(ch chan SessionEvent) error {
 	log.Println("Starting async tcp server to receive messages")
 
 	l, err := net.Listen("tcp", ":8080")
@@ -29,8 +25,8 @@ func Run(ch chan world.SessionEvent) error {
 	}
 }
 
-func handleConnection(c net.Conn, ch chan world.SessionEvent) {
-	s := world.NewSession(c, ch)
+func handleConnection(c net.Conn, ch chan SessionEvent) {
+	s := NewSession(c, ch)
 	if err := s.Tail(); err != nil {
 		log.Println("Error handling connection", err)
 		return

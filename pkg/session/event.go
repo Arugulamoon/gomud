@@ -1,6 +1,4 @@
-package world
-
-// CONTEXT: Session? Server?
+package session
 
 type SessionEvent struct {
 	Session *Session

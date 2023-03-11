@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/Arugulamoon/gomud/pkg/server"
+	"github.com/Arugulamoon/gomud/pkg/session"
 	"github.com/Arugulamoon/gomud/pkg/world"
 )
 
@@ -13,7 +13,7 @@ func main() {
 	w.Load()
 
 	// Create a channel to receive session events
-	sessionEventChannel := make(chan world.SessionEvent)
+	sessionEventChannel := make(chan session.SessionEvent)
 
 	// Start an async handler to react to session events
 	h := *world.NewSessionHandler(w, sessionEventChannel)
@@ -25,7 +25,7 @@ func main() {
 	// - Announce messages by creating message events
 	// Translate inputs into Events
 	// Disconnect connections
-	if err := server.Run(sessionEventChannel); err != nil {
+	if err := session.Run(sessionEventChannel); err != nil {
 		log.Fatal(err)
 	}
 }

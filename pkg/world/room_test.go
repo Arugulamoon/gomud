@@ -1,22 +1,30 @@
 package world
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/Arugulamoon/gomud/pkg/character"
+	"github.com/Arugulamoon/gomud/pkg/session"
+)
 
 func TestContainsCharacter(t *testing.T) {
-	char1 := NewCharacter()
-	char2 := NewCharacter()
+	char1 := character.NewCharacter()
+	char2 := character.NewCharacter()
 
 	emptyRoom := Room{
-		Sessions: make(map[string]*Session),
+		Sessions:   make(map[string]*session.Session),
+		Characters: make(map[string]*character.Character),
 	}
 
 	roomWithChar1 := Room{
-		Sessions: make(map[string]*Session),
+		Sessions:   make(map[string]*session.Session),
+		Characters: make(map[string]*character.Character),
 	}
-	roomWithChar1.Sessions["1"] = &Session{
+	roomWithChar1.Sessions["1"] = &session.Session{
 		Id:        "1",
 		Character: char1,
 	}
+	roomWithChar1.Characters["1"] = char1
 
 	type given struct {
 		room Room

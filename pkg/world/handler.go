@@ -1,13 +1,13 @@
 package world
 
-// CONTEXT: World
+import "github.com/Arugulamoon/gomud/pkg/session"
 
 type SessionHandler struct {
 	World        *World
-	EventChannel <-chan SessionEvent
+	EventChannel <-chan session.SessionEvent
 }
 
-func NewSessionHandler(w *World, ch <-chan SessionEvent) *SessionHandler {
+func NewSessionHandler(w *World, ch <-chan session.SessionEvent) *SessionHandler {
 	return &SessionHandler{
 		World:        w,
 		EventChannel: ch,
@@ -20,13 +20,13 @@ func (h *SessionHandler) Start() {
 
 		switch event := sessionEvent.Event.(type) {
 
-		case *SessionCreateEvent:
+		case *session.SessionCreateEvent:
 			h.World.HandleCharacterJoined(s)
 
-		case *SessionDisconnectEvent:
+		case *session.SessionDisconnectEvent:
 			h.World.HandleCharacterLeft(s)
 
-		case *SessionInputEvent:
+		case *session.SessionInputEvent:
 			h.World.HandleCharacterInput(s, event.Input)
 		}
 	}

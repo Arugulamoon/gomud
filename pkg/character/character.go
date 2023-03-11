@@ -1,4 +1,4 @@
-package world
+package character
 
 import (
 	"fmt"
@@ -6,14 +6,10 @@ import (
 )
 
 type room interface {
-	Description() string
-	RoomLinks() []*RoomLink                 // TODO: Remove
-	ConnectedSessions() map[string]*Session // TODO: Remove
-	ContainsCharacter(name string) bool     // TODO: Remove?
-	RemoveCharacter(s *Session)             // TODO: Remove?
+	GetId() string
+	GetDescription() string
 }
 
-// Character
 type Character struct {
 	Id, Name string
 	Room     room

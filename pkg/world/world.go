@@ -4,35 +4,40 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Arugulamoon/gomud/pkg/character"
 	"github.com/Arugulamoon/gomud/pkg/input"
+	"github.com/Arugulamoon/gomud/pkg/session"
 )
 
 type World struct {
-	Characters map[string]*Character
-	Rooms      []*Room
+	Characters map[string]*character.Character
+	Rooms      map[string]*Room
 }
 
 func New() *World {
-	return &World{}
+	return &World{
+		Characters: make(map[string]*character.Character),
+	}
 }
 
 // TODO: Move into yaml
 func (w *World) Load() {
-	w.Rooms = []*Room{
-		{
-			Id:   "Bedroom",
-			Desc: "You have entered your bedroom. There is a door leading out! (type \"/open door\" to leave the bedroom)",
+	w.Rooms = map[string]*Room{
+		"Bedroom": {
+			Id:          "Bedroom",
+			Description: "You have entered your bedroom. There is a door leading out! (type \"/open door\" to leave the bedroom)",
 			Links: []*RoomLink{
 				{
 					Verb:   "/open door",
 					RoomId: "Hallway",
 				},
 			},
-			Sessions: make(map[string]*Session),
+			Sessions:   make(map[string]*session.Session),
+			Characters: make(map[string]*character.Character),
 		},
-		{
-			Id:   "Hallway",
-			Desc: "You have entered a hallway with doors at either end. (type \"/open north door\" to enter the living room or \"/open south door\" to enter the bedroom)",
+		"Hallway": {
+			Id:          "Hallway",
+			Description: "You have entered a hallway with doors at either end. (type \"/open north door\" to enter the living room or \"/open south door\" to enter the bedroom)",
 			Links: []*RoomLink{
 				{
 					Verb:   "/open north door",
@@ -43,33 +48,36 @@ func (w *World) Load() {
 					RoomId: "Bedroom",
 				},
 			},
-			Sessions: make(map[string]*Session),
+			Sessions:   make(map[string]*session.Session),
+			Characters: make(map[string]*character.Character),
 		},
-		{
-			Id:   "LivingRoom",
-			Desc: "You have entered the living room. (type \"/open door\" to enter the hallway)",
+		"LivingRoom": {
+			Id:          "LivingRoom",
+			Description: "You have entered the living room. (type \"/open door\" to enter the hallway)",
 			Links: []*RoomLink{
 				{
 					Verb:   "/open door",
 					RoomId: "Hallway",
 				},
 			},
-			Sessions: make(map[string]*Session),
+			Sessions:   make(map[string]*session.Session),
+			Characters: make(map[string]*character.Character),
 		},
 	}
 }
 
-func (w *World) HandleCharacterJoined(s *Session) {
+func (w *World) HandleCharacterJoined(s *session.Session) {
 	w.Characters[s.Character.Id] = s.Character
-	w.Rooms[0].AddCharacter(s)
+	w.Rooms["Bedroom"].AddCharacter(s)
 
 	s.WriteLine(fmt.Sprintf("Welcome %s!", s.Character.Name))
 	s.WriteLine("")
-	s.WriteLine(s.Character.Room.Description())
+	s.WriteLine(s.Character.Room.GetDescription())
 }
 
-func (w *World) HandleCharacterLeft(s *Session) {
-	s.Character.Room.RemoveCharacter(s)
+func (w *World) HandleCharacterLeft(s *session.Session) {
+	room := w.Rooms[s.Character.Room.GetId()]
+	room.RemoveCharacter(s)
 	delete(w.Characters, s.Character.Id)
 }
 
@@ -82,10 +90,11 @@ func (w *World) getRoomById(id string) *Room {
 	return nil
 }
 
-func (w *World) HandleCharacterInput(s *Session, inp string) {
+func (w *World) HandleCharacterInput(s *session.Session, inp string) {
 	subject := s.Character.Name
 
-	room := s.Character.Room
+	roomId := s.Character.Room.GetId()
+	room := w.Rooms[roomId]
 	for _, link := range room.RoomLinks() {
 		if link.Verb == inp {
 			target := w.getRoomById(link.RoomId)
@@ -110,7 +119,7 @@ func (w *World) HandleCharacterInput(s *Session, inp string) {
 	} else {
 		s.WriteLine(input.ProcessInput(subject, verb, args, subject, hasArgs))
 
-		for id, other := range s.Character.Room.ConnectedSessions() {
+		for id, other := range room.ConnectedSessions() {
 			if id != s.Id {
 				observer := other.Character.Name
 				other.WriteLine(input.ProcessInput(subject, verb, args, observer, hasArgs))
@@ -119,12 +128,12 @@ func (w *World) HandleCharacterInput(s *Session, inp string) {
 	}
 }
 
-func (w *World) MoveCharacter(s *Session, targetRoom *Room) {
+func (w *World) MoveCharacter(s *session.Session, targetRoom *Room) {
 	// Update Rooms
-	currentRoom := s.Character.Room
+	currentRoom := w.Rooms[s.Character.Room.GetId()]
 	currentRoom.RemoveCharacter(s)
 	targetRoom.AddCharacter(s)
 
 	// Update Character
-	s.WriteLine(s.Character.Room.Description())
+	s.WriteLine(s.Character.Room.GetDescription())
 }

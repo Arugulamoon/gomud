@@ -1,11 +1,11 @@
-package world
-
-// CONTEXT: Server? Session?
+package session
 
 import (
 	"fmt"
 	"log"
 	"net"
+
+	"github.com/Arugulamoon/gomud/pkg/character"
 )
 
 type Session struct {
@@ -13,7 +13,7 @@ type Session struct {
 	Connection   net.Conn
 	EventChannel chan SessionEvent
 
-	Character *Character
+	Character *character.Character
 }
 
 func NewSession(c net.Conn, ch chan SessionEvent) *Session {
@@ -22,7 +22,7 @@ func NewSession(c net.Conn, ch chan SessionEvent) *Session {
 		Connection:   c,
 		EventChannel: ch,
 
-		Character: NewCharacter(),
+		Character: character.NewCharacter(),
 	}
 	log.Println("Server accepted connection and created session:", s.SessionId())
 
