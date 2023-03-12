@@ -66,19 +66,7 @@ func (s *Session) Tail() error {
 			break
 		}
 
-		// May receive messages ending with \r or \r\n
-		// References:
-		// * https://stackoverflow.com/questions/65195938/how-to-convert-a-string-to-rune
-		// * https://codereview.appspot.com/5495049/patch/2003/1004
-		msg := strings.Map(func(r rune) rune {
-			if r == 13 {
-				return 0
-			}
-			if r == 10 {
-				return 0
-			}
-			return r
-		}, string(buf))
+		msg := trimEOL(buf)
 		log.Printf("Received message on session %s: %s", s.SessionId(), msg)
 
 		s.EventChannel <- SessionEvent{
@@ -90,6 +78,22 @@ func (s *Session) Tail() error {
 	}
 
 	return nil
+}
+
+// May receive messages ending with \r or \r\n
+// References:
+// * https://stackoverflow.com/questions/65195938/how-to-convert-a-string-to-rune
+// * https://codereview.appspot.com/5495049/patch/2003/1004
+func trimEOL(input []byte) string {
+	return strings.Map(func(r rune) rune {
+		if r == 13 { // \n
+			return 0
+		}
+		if r == 10 { // \r
+			return 0
+		}
+		return r
+	}, string(input))
 }
 
 var nextId = 1
