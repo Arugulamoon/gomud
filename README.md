@@ -19,11 +19,6 @@ go run cmd/client/main.go
 openssl s_client -connect localhost:7324
 ```
 
-## Prototyping Terminal
-```bash
-go run cmd/prototype/main.go
-```
-
 ## Generate Self-Signed SSL Certificate
 
 ### You must have a CA
