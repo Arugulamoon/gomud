@@ -47,8 +47,8 @@ func (s *Session) WriteLine(str string) error {
 }
 
 func (s *Session) Tail() error {
-	buf := make([]byte, 4096)
 	for {
+		buf := make([]byte, 4096)
 		// Broadcast user input
 		n, err := s.Connection.Read(buf)
 		if err != nil {
