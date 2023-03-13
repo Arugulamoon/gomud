@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"strings"
+	"unicode"
 
 	"github.com/Arugulamoon/gomud/pkg/character"
 )
@@ -81,18 +82,12 @@ func (s *Session) Tail() error {
 }
 
 // May receive messages ending with \r or \r\n
-// References:
-// * https://stackoverflow.com/questions/65195938/how-to-convert-a-string-to-rune
-// * https://codereview.appspot.com/5495049/patch/2003/1004
 func trimEOL(input []byte) string {
 	return strings.Map(func(r rune) rune {
-		if r == 13 { // \n
-			return 0
+		if unicode.IsPrint(r) {
+			return r
 		}
-		if r == 10 { // \r
-			return 0
-		}
-		return r
+		return -1
 	}, string(input))
 }
 
