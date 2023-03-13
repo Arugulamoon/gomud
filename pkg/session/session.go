@@ -68,13 +68,15 @@ func (s *Session) Tail() error {
 		}
 
 		msg := trimEOL(buf)
-		log.Printf("Received message on session %s: %s", s.SessionId(), msg)
+		if msg != "" {
+			log.Printf("Received message on session %s: %s", s.SessionId(), msg)
 
-		s.EventChannel <- SessionEvent{
-			Session: s,
-			Event: &SessionInputEvent{
-				Input: msg,
-			},
+			s.EventChannel <- SessionEvent{
+				Session: s,
+				Event: &SessionInputEvent{
+					Input: msg,
+				},
+			}
 		}
 	}
 

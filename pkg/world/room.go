@@ -8,7 +8,7 @@ import (
 
 type Room struct {
 	Id, Description string
-	Links           []*RoomLink
+	Links           map[string]*RoomLink
 	Characters      map[string]*character.Character
 }
 
@@ -20,18 +20,23 @@ func (r *Room) GetDescription() string {
 	return r.Description
 }
 
-func (r *Room) RoomLinks() []*RoomLink {
+func (r *Room) RoomLinks() map[string]*RoomLink {
 	return r.Links
 }
 
-func (r *Room) GetCharacters() map[string]*character.Character {
-	return r.Characters
+func (r *Room) GetCharacterNames() []string {
+	// TODO: Make more efficient with map/filter/reduce?
+	var names []string
+	for _, char := range r.Characters {
+		names = append(names, char.Name)
+	}
+	return names
 }
 
-func (r *Room) SendMessage(c *character.Character, msg string) {
-	for id, other := range r.Characters {
-		if id != c.Id {
-			other.SendMessage(msg)
+func (r *Room) BroadcastMessage(speaker, msg string) {
+	for _, char := range r.Characters {
+		if char.Name != speaker {
+			char.SendMessage(msg)
 		}
 	}
 }
@@ -48,13 +53,13 @@ func (r *Room) ContainsCharacter(name string) bool {
 func (r *Room) AddCharacter(c *character.Character) {
 	r.Characters[c.Id] = c
 	c.Room = r
-	r.SendMessage(c, fmt.Sprintf("%s entered the room.", c.Name))
+	r.BroadcastMessage(c.Name, fmt.Sprintf("%s entered the room.", c.Name))
 }
 
 func (r *Room) RemoveCharacter(c *character.Character) {
 	delete(r.Characters, c.Id)
 	c.Room = nil
-	r.SendMessage(c, fmt.Sprintf("%s left the room.", c.Name))
+	r.BroadcastMessage(c.Name, fmt.Sprintf("%s left the room.", c.Name))
 }
 
 type RoomLink struct {

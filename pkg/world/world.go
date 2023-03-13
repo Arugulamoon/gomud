@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/Arugulamoon/gomud/pkg/character"
-	"github.com/Arugulamoon/gomud/pkg/input"
 )
 
 type World struct {
@@ -25,8 +24,8 @@ func (w *World) Load() {
 		"Bedroom": {
 			Id:          "Bedroom",
 			Description: "You have entered your bedroom. There is a door leading out! (type \"/open door\" to leave the bedroom)",
-			Links: []*RoomLink{
-				{
+			Links: map[string]*RoomLink{
+				"/open door": {
 					Verb:   "/open door",
 					RoomId: "Hallway",
 				},
@@ -36,12 +35,12 @@ func (w *World) Load() {
 		"Hallway": {
 			Id:          "Hallway",
 			Description: "You have entered a hallway with doors at either end. (type \"/open north door\" to enter the living room or \"/open south door\" to enter the bedroom)",
-			Links: []*RoomLink{
-				{
+			Links: map[string]*RoomLink{
+				"/open north door": {
 					Verb:   "/open north door",
 					RoomId: "LivingRoom",
 				},
-				{
+				"/open south door": {
 					Verb:   "/open south door",
 					RoomId: "Bedroom",
 				},
@@ -51,8 +50,8 @@ func (w *World) Load() {
 		"LivingRoom": {
 			Id:          "LivingRoom",
 			Description: "You have entered the living room. (type \"/open door\" to enter the hallway)",
-			Links: []*RoomLink{
-				{
+			Links: map[string]*RoomLink{
+				"/open door": {
 					Verb:   "/open door",
 					RoomId: "Hallway",
 				},
@@ -62,8 +61,18 @@ func (w *World) Load() {
 	}
 }
 
+func (w *World) GetCharacterNames() []string {
+	// TODO: Make more efficient with map/filter/reduce?
+	var names []string
+	for _, char := range w.Characters {
+		names = append(names, char.Name)
+	}
+	return names
+}
+
 func (w *World) HandleCharacterJoined(c *character.Character) {
 	w.Characters[c.Id] = c
+	c.World = w
 	w.Rooms["Bedroom"].AddCharacter(c)
 
 	c.SendMessage(fmt.Sprintf("Welcome %s!", c.Name))
@@ -86,42 +95,65 @@ func (w *World) getRoomById(id string) *Room {
 	return nil
 }
 
-func (w *World) HandleCharacterInput(c *character.Character, inp string) {
-	subject := c.Name
+func (w *World) HandleCharacterInput(char *character.Character, inp string) {
+	room := w.Rooms[char.Room.GetId()]
 
-	roomId := c.Room.GetId()
-	room := w.Rooms[roomId]
-	for _, link := range room.RoomLinks() {
-		if link.Verb == inp {
+	// If match RoomLink then move
+	targetRoom := w.moveToRoom(room, inp)
+	if targetRoom != nil {
+		w.MoveCharacter(char, targetRoom)
+		return
+	}
+
+	// otherwise, separate into verb/action and args
+	verb, hasArgs, args := handleCharacterInput(char, inp)
+
+	switch verb {
+	case character.SHOUT:
+		char.Shout(args)
+	case character.SAY:
+		// msg is not empty
+		if hasArgs {
+			char.Say(args)
+		}
+	case character.WAVE:
+		if hasArgs {
+			char.WaveAtTarget(args)
+		} else {
+			char.Wave()
+		}
+	case character.WHO:
+		// TODO: Add check for 'all'
+		if hasArgs {
+			char.WhoAll()
+		} else {
+			char.Who()
+		}
+	}
+}
+
+func (w *World) moveToRoom(currentRoom *Room, inp string) *Room {
+	for verb, link := range currentRoom.RoomLinks() {
+		if verb == inp {
 			target := w.getRoomById(link.RoomId)
 			if target != nil {
-				w.MoveCharacter(c, target)
-				return
+				return target
 			}
 		}
 	}
+	return nil
+}
 
+func handleCharacterInput(c *character.Character, input string) (string, bool, string) {
 	verb := "say"
-	args := inp
 	hasArgs := true
-	if inp[0:1] == "/" {
+	args := input
+	if input[0:1] == "/" {
 		var cmd string
-		cmd, args, hasArgs = strings.Cut(inp, " ")
+		cmd, args, hasArgs = strings.Cut(input, " ")
 		verb = cmd[1:]
 	}
-
-	if verb != "say" && hasArgs && !room.ContainsCharacter(args) {
-		c.SendMessage("There is no one around with that name...")
-	} else {
-		c.SendMessage(input.ProcessInput(subject, verb, args, subject, hasArgs))
-
-		for id, other := range room.GetCharacters() {
-			if id != c.Id {
-				observer := other.Name
-				other.SendMessage(input.ProcessInput(subject, verb, args, observer, hasArgs))
-			}
-		}
-	}
+	return verb, hasArgs, args
 }
 
 func (w *World) MoveCharacter(c *character.Character, targetRoom *Room) {
@@ -132,4 +164,12 @@ func (w *World) MoveCharacter(c *character.Character, targetRoom *Room) {
 
 	// Update Character
 	c.SendMessage(c.Room.GetDescription())
+}
+
+func (w *World) BroadcastMessage(speaker, msg string) {
+	for _, char := range w.Characters {
+		if char.Name != speaker {
+			char.SendMessage(msg)
+		}
+	}
 }

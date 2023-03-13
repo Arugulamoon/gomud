@@ -10,7 +10,7 @@ func ProcessInput(subject, verb, args, observer string, hasArgs bool) string {
 	// ie open door will switch door state to open / close door
 	if hasArgs {
 		if verb == "say" {
-			return Say(subject, args, observer)
+			return say(subject, args, observer)
 		}
 		return fmt.Sprintf("%s %s at %s.",
 			ReflexiveSubject(subject, observer),
@@ -29,7 +29,7 @@ func ProcessInput(subject, verb, args, observer string, hasArgs bool) string {
 		ReflexiveVerb(subject, verb, observer))
 }
 
-func Say(subject, args, observer string) string {
+func say(subject, args, observer string) string {
 	return fmt.Sprintf("%s %s, \"%s\"",
 		ReflexiveSubject(subject, observer),
 		ReflexiveVerb(subject, "say", observer),
