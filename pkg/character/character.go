@@ -18,7 +18,6 @@ type room interface {
 	GetId() string
 	GetDescription() string
 	GetCharacterNames() []string
-	ContainsCharacter(name string) bool
 	BroadcastMessage(speaker, msg string)
 }
 
@@ -57,12 +56,8 @@ func (c *Character) Wave() {
 }
 
 func (c *Character) WaveAtTarget(target string) {
-	if c.Room.ContainsCharacter(target) {
-		c.Session.WriteLine(fmt.Sprintf("You wave at %s.", target))
-		c.Room.BroadcastMessage(c.Name, fmt.Sprintf("%s waved at %s.", c.Name, target))
-	} else {
-		c.Session.WriteLine("There is no one around with that name...")
-	}
+	c.Session.WriteLine(fmt.Sprintf("You wave at %s.", target))
+	c.Room.BroadcastMessage(c.Name, fmt.Sprintf("%s waved at %s.", c.Name, target))
 }
 
 func (c *Character) WhoAll() {
@@ -79,15 +74,10 @@ func (c *Character) Who() {
 	}
 }
 
-// func (c *Character) Tell(target *Character, msg string) {
-// 	if c.World.ContainsCharacter(target) {
-// 		c.Session.WriteLine(fmt.Sprintf("You tell %s, \"%s\"", target, msg))
-
-// 		c.Room.BroadcastMessage(c.Name, fmt.Sprintf("%s waved at %s.", c.Name, target))
-// 	} else {
-// 		c.Session.WriteLine("There is no one around with that name...")
-// 	}
-// }
+func (c *Character) Tell(target *Character, msg string) {
+	c.Session.WriteLine(fmt.Sprintf("You tell %s, \"%s\"", target, msg))
+	target.SendMessage(fmt.Sprintf("%s tells you, \"%s\"", c.Name, msg))
+}
 
 var nextId = 1
 

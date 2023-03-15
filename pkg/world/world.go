@@ -10,6 +10,8 @@ import (
 type World struct {
 	Characters map[string]*character.Character
 	Rooms      map[string]*Room
+
+	// CharactersToRooms map[string]string
 }
 
 func New() *World {
@@ -109,23 +111,53 @@ func (w *World) HandleCharacterInput(char *character.Character, inp string) {
 	verb, hasArgs, args := handleCharacterInput(char, inp)
 
 	switch verb {
-	case character.SHOUT:
-		char.Shout(args)
+
 	case character.SAY:
-		// msg is not empty
 		if hasArgs {
 			char.Say(args)
+		} else {
+			char.SendMessage("Cannot send empty message...")
 		}
+
+	case character.SHOUT:
+		if hasArgs {
+			char.Shout(args)
+		} else {
+			char.SendMessage("Cannot send empty message...")
+		}
+
+	case character.TELL:
+		if hasArgs {
+			target, msg, hasMsg := strings.Cut(args, " ")
+			if hasMsg {
+				if w.containsCharacter(target) {
+					char.Tell(w.Characters[target], msg)
+				} else {
+					char.SendMessage("There is no one around with that name...")
+				}
+			} else {
+				char.SendMessage("Cannot send empty message...")
+			}
+		} else {
+			char.SendMessage("Cannot send empty target and message...")
+		}
+
 	case character.WAVE:
 		if hasArgs {
-			char.WaveAtTarget(args)
+			if room.ContainsCharacter(args) {
+				char.WaveAtTarget(args)
+			} else {
+				char.SendMessage("There is no one around with that name...")
+			}
 		} else {
 			char.Wave()
 		}
+
 	case character.WHO:
-		// TODO: Add check for 'all'
 		if hasArgs {
-			char.WhoAll()
+			if args == "all" {
+				char.WhoAll()
+			}
 		} else {
 			char.Who()
 		}
@@ -172,4 +204,13 @@ func (w *World) BroadcastMessage(speaker, msg string) {
 			char.SendMessage(msg)
 		}
 	}
+}
+
+func (w *World) containsCharacter(name string) bool {
+	for _, character := range w.Characters {
+		if character.Name == name {
+			return true
+		}
+	}
+	return false
 }
