@@ -10,7 +10,9 @@ type session interface {
 }
 
 type world interface {
+	GetCharacters() map[string]*Character
 	GetCharacterNames() []string
+	ContainsCharacter(args string) bool
 	BroadcastMessage(speaker, msg string)
 }
 
@@ -18,6 +20,7 @@ type room interface {
 	GetId() string
 	GetDescription() string
 	GetCharacterNames() []string
+	ContainsCharacter(args string) bool
 	BroadcastMessage(speaker, msg string)
 }
 
@@ -38,45 +41,6 @@ func New(s session) *Character {
 
 func (c *Character) SendMessage(msg string) {
 	c.Session.WriteLine(msg)
-}
-
-func (c *Character) Shout(msg string) {
-	c.Session.WriteLine(fmt.Sprintf("You shout, \"%s\"", msg))
-	c.World.BroadcastMessage(c.Name, fmt.Sprintf("%s shouted, \"%s\"", c.Name, msg))
-}
-
-func (c *Character) Say(msg string) {
-	c.Session.WriteLine(fmt.Sprintf("You say, \"%s\"", msg))
-	c.Room.BroadcastMessage(c.Name, fmt.Sprintf("%s said, \"%s\"", c.Name, msg))
-}
-
-func (c *Character) Wave() {
-	c.Session.WriteLine("You wave.")
-	c.Room.BroadcastMessage("%s waved.", c.Name)
-}
-
-func (c *Character) WaveAtTarget(target string) {
-	c.Session.WriteLine(fmt.Sprintf("You wave at %s.", target))
-	c.Room.BroadcastMessage(c.Name, fmt.Sprintf("%s waved at %s.", c.Name, target))
-}
-
-func (c *Character) WhoAll() {
-	c.Session.WriteLine("/who all:")
-	for _, name := range c.World.GetCharacterNames() {
-		c.Session.WriteLine(fmt.Sprintf("  %s", name))
-	}
-}
-
-func (c *Character) Who() {
-	c.Session.WriteLine("/who:")
-	for _, name := range c.Room.GetCharacterNames() {
-		c.Session.WriteLine(fmt.Sprintf("  %s", name))
-	}
-}
-
-func (c *Character) Tell(target *Character, msg string) {
-	c.Session.WriteLine(fmt.Sprintf("You tell %s, \"%s\"", target, msg))
-	target.SendMessage(fmt.Sprintf("%s tells you, \"%s\"", c.Name, msg))
 }
 
 var nextId = 1

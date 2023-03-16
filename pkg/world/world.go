@@ -5,13 +5,12 @@ import (
 	"strings"
 
 	"github.com/Arugulamoon/gomud/pkg/character"
+	"github.com/Arugulamoon/gomud/pkg/command"
 )
 
 type World struct {
 	Characters map[string]*character.Character
 	Rooms      map[string]*Room
-
-	// CharactersToRooms map[string]string
 }
 
 func New() *World {
@@ -72,6 +71,10 @@ func (w *World) GetCharacterNames() []string {
 	return names
 }
 
+func (w *World) GetCharacters() map[string]*character.Character {
+	return w.Characters
+}
+
 func (w *World) HandleCharacterJoined(c *character.Character) {
 	w.Characters[c.Id] = c
 	c.World = w
@@ -108,59 +111,19 @@ func (w *World) HandleCharacterInput(char *character.Character, inp string) {
 	}
 
 	// otherwise, separate into verb/action and args
-	verb, hasArgs, args := handleCharacterInput(char, inp)
+	verb, args := handleCharacterInput(char, inp)
 
 	switch verb {
-
-	case character.SAY:
-		if hasArgs {
-			char.Say(args)
-		} else {
-			char.SendMessage("Cannot send empty message...")
-		}
-
-	case character.SHOUT:
-		if hasArgs {
-			char.Shout(args)
-		} else {
-			char.SendMessage("Cannot send empty message...")
-		}
-
-	case character.TELL:
-		if hasArgs {
-			target, msg, hasMsg := strings.Cut(args, " ")
-			if hasMsg {
-				if w.containsCharacter(target) {
-					char.Tell(w.Characters[target], msg)
-				} else {
-					char.SendMessage("There is no one around with that name...")
-				}
-			} else {
-				char.SendMessage("Cannot send empty message...")
-			}
-		} else {
-			char.SendMessage("Cannot send empty target and message...")
-		}
-
-	case character.WAVE:
-		if hasArgs {
-			if room.ContainsCharacter(args) {
-				char.WaveAtTarget(args)
-			} else {
-				char.SendMessage("There is no one around with that name...")
-			}
-		} else {
-			char.Wave()
-		}
-
-	case character.WHO:
-		if hasArgs {
-			if args == "all" {
-				char.WhoAll()
-			}
-		} else {
-			char.Who()
-		}
+	case command.SAY:
+		command.Say(char, args)
+	case command.SHOUT:
+		command.Shout(char, args)
+	case command.TELL:
+		command.Tell(char, args)
+	case command.WAVE:
+		command.Wave(char, args)
+	case command.WHO:
+		command.Who(char, args)
 	}
 }
 
@@ -176,16 +139,15 @@ func (w *World) moveToRoom(currentRoom *Room, inp string) *Room {
 	return nil
 }
 
-func handleCharacterInput(c *character.Character, input string) (string, bool, string) {
+func handleCharacterInput(c *character.Character, input string) (string, string) {
 	verb := "say"
-	hasArgs := true
 	args := input
 	if input[0:1] == "/" {
 		var cmd string
-		cmd, args, hasArgs = strings.Cut(input, " ")
+		cmd, args, _ = strings.Cut(input, " ")
 		verb = cmd[1:]
 	}
-	return verb, hasArgs, args
+	return verb, args
 }
 
 func (w *World) MoveCharacter(c *character.Character, targetRoom *Room) {
@@ -206,7 +168,7 @@ func (w *World) BroadcastMessage(speaker, msg string) {
 	}
 }
 
-func (w *World) containsCharacter(name string) bool {
+func (w *World) ContainsCharacter(name string) bool {
 	for _, character := range w.Characters {
 		if character.Name == name {
 			return true
