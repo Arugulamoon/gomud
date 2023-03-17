@@ -75,6 +75,23 @@ func (w *World) GetCharacters() map[string]*character.Character {
 	return w.Characters
 }
 
+func (w *World) BroadcastMessage(speaker, msg string) {
+	for _, char := range w.Characters {
+		if char.Name != speaker {
+			char.SendMessage(msg)
+		}
+	}
+}
+
+func (w *World) ContainsCharacter(name string) bool {
+	for _, character := range w.Characters {
+		if character.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
 func (w *World) HandleCharacterJoined(c *character.Character) {
 	w.Characters[c.Id] = c
 	c.World = w
@@ -106,12 +123,12 @@ func (w *World) HandleCharacterInput(char *character.Character, inp string) {
 	// If match RoomLink then move
 	targetRoom := w.moveToRoom(room, inp)
 	if targetRoom != nil {
-		w.MoveCharacter(char, targetRoom)
+		w.moveCharacter(char, targetRoom)
 		return
 	}
 
 	// otherwise, separate into verb/action and args
-	verb, args := handleCharacterInput(char, inp)
+	verb, args := parseCharacterInput(char, inp)
 
 	switch verb {
 	case command.SAY:
@@ -139,18 +156,7 @@ func (w *World) moveToRoom(currentRoom *Room, inp string) *Room {
 	return nil
 }
 
-func handleCharacterInput(c *character.Character, input string) (string, string) {
-	verb := "say"
-	args := input
-	if input[0:1] == "/" {
-		var cmd string
-		cmd, args, _ = strings.Cut(input, " ")
-		verb = cmd[1:]
-	}
-	return verb, args
-}
-
-func (w *World) MoveCharacter(c *character.Character, targetRoom *Room) {
+func (w *World) moveCharacter(c *character.Character, targetRoom *Room) {
 	// Update Rooms
 	currentRoom := w.Rooms[c.Room.GetId()]
 	currentRoom.RemoveCharacter(c)
@@ -160,19 +166,13 @@ func (w *World) MoveCharacter(c *character.Character, targetRoom *Room) {
 	c.SendMessage(c.Room.GetDescription())
 }
 
-func (w *World) BroadcastMessage(speaker, msg string) {
-	for _, char := range w.Characters {
-		if char.Name != speaker {
-			char.SendMessage(msg)
-		}
+func parseCharacterInput(c *character.Character, input string) (string, string) {
+	verb := "say"
+	args := input
+	if input[0:1] == "/" {
+		var cmd string
+		cmd, args, _ = strings.Cut(input, " ")
+		verb = cmd[1:]
 	}
-}
-
-func (w *World) ContainsCharacter(name string) bool {
-	for _, character := range w.Characters {
-		if character.Name == name {
-			return true
-		}
-	}
-	return false
+	return verb, args
 }
