@@ -1,5 +1,7 @@
 # gomud
 
+Home is a center. Taturo does not go on missions, but she goes with the group to Far East. Moving base. Home. Center.
+
 Quest: Level, Tasks, Goals, Rewards
 Currency: Gil, Tokens
 Long Walkway -> Enter Context (Room)
