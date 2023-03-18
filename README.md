@@ -2,6 +2,8 @@
 
 Home is a center. Taturo does not go on missions, but she goes with the group to Far East. Moving base. Home. Center.
 
+Being in the world is moving along main storyline, sidequests. All the while progressing through alternating sequences of witnessing something occuring, story, and performing actions. actions that effect change in the context.
+
 Quest: Level, Tasks, Goals, Rewards
 Currency: Gil, Tokens
 Long Walkway -> Enter Context (Room)
