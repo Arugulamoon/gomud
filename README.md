@@ -6,6 +6,8 @@ Being in the world is moving along main storyline, sidequests. All the while pro
 
 Performing actions prompts stories to progress and potentially being a trigger for another story. Which has a beginning and an end. 
 
+But effectively, you can freeze time on stories, wander around, do other things. Progress and Nurture?
+
 Quest: Level, Tasks, Goals, Rewards
 Currency: Gil, Tokens
 Long Walkway -> Enter Context (Room)
