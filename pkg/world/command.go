@@ -1,4 +1,4 @@
-package command
+package world
 
 import (
 	"fmt"
@@ -7,13 +7,28 @@ import (
 	"github.com/Arugulamoon/gomud/pkg/character"
 )
 
+const GOTO = "goto"
 const SAY = "say"
 const SHOUT = "shout"
 const TELL = "tell"
 const WAVE = "wave"
 const WHO = "who"
 
-type Command struct{}
+type Command struct {
+	World *World
+}
+
+func (cmd *Command) GoTo(char *character.Character, targRoomId string) {
+	currRoom := cmd.World.Rooms[char.Room.GetId()]
+	targRoom := currRoom.Links[targRoomId]
+	if targRoom == nil {
+		char.SendMessage("There is no one around with that name...")
+	} else {
+		currRoom.RemoveCharacter(char)
+		targRoom.AddCharacter(char)
+		char.SendMessage(char.Room.GetDescription())
+	}
+}
 
 func Say(char *character.Character, msg string) {
 	if msg == "" {
@@ -35,10 +50,10 @@ func Shout(char *character.Character, msg string) {
 
 func Tell(char *character.Character, args string) {
 	if args != "" {
-		targetName, msg, _ := strings.Cut(args, " ")
+		targetId, msg, _ := strings.Cut(args, " ")
 		if msg != "" {
-			if char.World.ContainsCharacter(targetName) {
-				target := char.World.GetCharacters()[targetName]
+			if char.World.ContainsCharacter(targetId) {
+				target := char.World.GetCharacters()[targetId]
 				char.SendMessage(fmt.Sprintf("You tell %s, \"%s\"", target.Name, msg))
 				target.SendMessage(fmt.Sprintf("%s tells you, \"%s\"", char.Name, msg))
 			} else {

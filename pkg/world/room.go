@@ -8,8 +8,17 @@ import (
 
 type Room struct {
 	Id, Description string
-	Links           map[string]*RoomLink
+	Links           map[string]*Room
 	Characters      map[string]*character.Character
+}
+
+func NewRoom(id, desc string) *Room {
+	return &Room{
+		Id:          id,
+		Description: desc,
+		Links:       make(map[string]*Room),
+		Characters:  make(map[string]*character.Character),
+	}
 }
 
 func (r *Room) GetId() string {
@@ -18,10 +27,6 @@ func (r *Room) GetId() string {
 
 func (r *Room) GetDescription() string {
 	return r.Description
-}
-
-func (r *Room) RoomLinks() map[string]*RoomLink {
-	return r.Links
 }
 
 func (r *Room) GetCharacterNames() []string {
@@ -60,8 +65,4 @@ func (r *Room) RemoveCharacter(c *character.Character) {
 	delete(r.Characters, c.Id)
 	c.Room = nil
 	r.BroadcastMessage(c.Name, fmt.Sprintf("%s left the room.", c.Name))
-}
-
-type RoomLink struct {
-	Verb, RoomId string
 }

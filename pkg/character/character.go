@@ -22,6 +22,7 @@ type room interface {
 	GetCharacterNames() []string
 	ContainsCharacter(args string) bool
 	BroadcastMessage(speaker, msg string)
+	RemoveCharacter(*Character)
 }
 
 type Character struct {
