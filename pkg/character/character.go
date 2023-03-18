@@ -13,7 +13,6 @@ type world interface {
 	GetCharacters() map[string]*Character
 	GetCharacterNames() []string
 	ContainsCharacter(args string) bool
-	BroadcastMessage(speaker, msg string)
 }
 
 type room interface {
@@ -21,7 +20,6 @@ type room interface {
 	GetDescription() string
 	GetCharacterNames() []string
 	ContainsCharacter(args string) bool
-	BroadcastMessage(speaker, msg string)
 	RemoveCharacter(*Character)
 }
 

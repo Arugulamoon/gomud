@@ -96,13 +96,13 @@ func (w *World) HandleCharacterInput(char *character.Character, inp string) {
 	case GOTO:
 		w.Commands[GOTO].GoTo(char, args)
 	case SAY:
-		Say(char, args)
+		w.Commands[SAY].Say(char, args)
 	case SHOUT:
-		Shout(char, args)
+		w.Commands[SHOUT].Shout(char, args)
 	case TELL:
 		Tell(char, args)
 	case WAVE:
-		Wave(char, args)
+		w.Commands[WAVE].Wave(char, args)
 	case WHO:
 		Who(char, args)
 	}

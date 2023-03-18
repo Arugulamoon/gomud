@@ -30,21 +30,22 @@ func (cmd *Command) GoTo(char *character.Character, targRoomId string) {
 	}
 }
 
-func Say(char *character.Character, msg string) {
+func (cmd *Command) Say(char *character.Character, msg string) {
 	if msg == "" {
 		char.SendMessage("Cannot send empty message...")
 	} else {
 		char.SendMessage(fmt.Sprintf("You say, \"%s\"", msg))
-		char.Room.BroadcastMessage(char.Name, fmt.Sprintf("%s said, \"%s\"", char.Name, msg))
+		room := cmd.World.Rooms[char.Room.GetId()]
+		room.BroadcastMessage(char.Name, fmt.Sprintf("%s said, \"%s\"", char.Name, msg))
 	}
 }
 
-func Shout(char *character.Character, msg string) {
+func (cmd *Command) Shout(char *character.Character, msg string) {
 	if msg == "" {
 		char.SendMessage("Cannot send empty message...")
 	} else {
 		char.SendMessage(fmt.Sprintf("You shout, \"%s\"", msg))
-		char.World.BroadcastMessage(char.Name, fmt.Sprintf("%s shouted, \"%s\"", char.Name, msg))
+		cmd.World.BroadcastMessage(char.Name, fmt.Sprintf("%s shouted, \"%s\"", char.Name, msg))
 	}
 }
 
@@ -67,17 +68,18 @@ func Tell(char *character.Character, args string) {
 	}
 }
 
-func Wave(char *character.Character, args string) {
+func (cmd *Command) Wave(char *character.Character, args string) {
+	room := cmd.World.Rooms[char.Room.GetId()]
 	if args != "" {
 		if char.Room.ContainsCharacter(args) {
 			char.SendMessage(fmt.Sprintf("You wave at %s.", args))
-			char.Room.BroadcastMessage(char.Name, fmt.Sprintf("%s waved at %s.", char.Name, args))
+			room.BroadcastMessage(char.Name, fmt.Sprintf("%s waved at %s.", char.Name, args))
 		} else {
 			char.SendMessage("There is no one around with that name...")
 		}
 	} else {
 		char.SendMessage("You wave.")
-		char.Room.BroadcastMessage(char.Name, fmt.Sprintf("%s waved.", char.Name))
+		room.BroadcastMessage(char.Name, fmt.Sprintf("%s waved.", char.Name))
 	}
 }
 
