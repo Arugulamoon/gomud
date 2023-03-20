@@ -8,7 +8,7 @@ import (
 	"github.com/Arugulamoon/gomud/pkg/session"
 )
 
-func Run(ch chan session.SessionEvent) error {
+func Run(ch chan session.SessionEvent, wid string) error {
 	log.Println("Starting async tcp server to receive messages")
 
 	cert, err := tls.LoadX509KeyPair("server.crt", "server.key")
@@ -31,12 +31,12 @@ func Run(ch chan session.SessionEvent) error {
 			continue
 		}
 		// Start an async handler to receive messages
-		go handleConnection(c, ch)
+		go handleConnection(c, ch, wid)
 	}
 }
 
-func handleConnection(c net.Conn, ch chan session.SessionEvent) {
-	s := session.New(c, ch)
+func handleConnection(c net.Conn, ch chan session.SessionEvent, wid string) {
+	s := session.New(c, ch, wid)
 	if err := s.Tail(); err != nil {
 		log.Println("Error handling connection", err)
 		return

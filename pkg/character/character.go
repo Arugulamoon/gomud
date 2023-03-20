@@ -9,25 +9,10 @@ type session interface {
 	WriteLine(msg string) error
 }
 
-type world interface {
-	GetCharacters() map[string]*Character
-	GetCharacterNames() []string
-	ContainsCharacter(args string) bool
-}
-
-type room interface {
-	GetId() string
-	GetDescription() string
-	GetCharacterNames() []string
-	ContainsCharacter(args string) bool
-	RemoveCharacter(*Character)
-}
-
 type Character struct {
-	Id, Name string
-	Session  session
-	World    world
-	Room     room
+	Id, Name        string
+	Session         session
+	WorldId, RoomId string
 }
 
 func New(s session) *Character {

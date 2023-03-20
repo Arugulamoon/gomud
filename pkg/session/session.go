@@ -15,14 +15,17 @@ type Session struct {
 	Connection   net.Conn
 	EventChannel chan SessionEvent
 
+	WorldId string // Eventually be able to move worlds?
+
 	Character *character.Character
 }
 
-func New(c net.Conn, ch chan SessionEvent) *Session {
+func New(c net.Conn, ch chan SessionEvent, wid string) *Session {
 	s := &Session{
 		Id:           generateId(),
 		Connection:   c,
 		EventChannel: ch,
+		WorldId:      wid,
 	}
 	s.Character = character.New(s)
 	log.Println("Server accepted connection and created session:", s.SessionId())

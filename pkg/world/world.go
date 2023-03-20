@@ -7,28 +7,41 @@ import (
 	"github.com/Arugulamoon/gomud/pkg/character"
 )
 
+const GOTO = "goto"
+const SAY = "say"
+const SHOUT = "shout"
+const TELL = "tell"
+const WAVE = "wave"
+const WHO = "who"
+
+type command interface {
+	Perform(char *character.Character, args string)
+}
+
 type World struct {
-	Commands   map[string]*Command
+	Id         string
+	Commands   map[string]*command
 	Rooms      map[string]*Room
 	Characters map[string]*character.Character
 }
 
-func New() *World {
+func New(id string) *World {
 	return &World{
-		Commands:   make(map[string]*Command),
+		Id:         id,
+		Commands:   make(map[string]*command),
 		Rooms:      make(map[string]*Room),
 		Characters: make(map[string]*character.Character),
 	}
 }
 
 func (w *World) Load() {
-	w.Commands = map[string]*Command{
-		GOTO:  {w},
-		SAY:   {w},
-		SHOUT: {w},
-		TELL:  {w},
-		WAVE:  {w},
-		WHO:   {w},
+	w.Commands = map[string]*command{
+		"goto":  {w},
+		"say":   {w},
+		"shout": {w},
+		"tell":  {w},
+		"wave":  {w},
+		"who":   {w},
 	}
 
 	bedroom := NewRoom("Bedroom", "You have entered your bedroom. There is a door leading out! (type \"/goto Hallway\" to leave the bedroom)")
@@ -41,15 +54,6 @@ func (w *World) Load() {
 	w.Rooms[bedroom.Id] = bedroom
 	w.Rooms[hallway.Id] = hallway
 	w.Rooms[livingRoom.Id] = livingRoom
-}
-
-func (w *World) GetCharacterNames() []string {
-	// TODO: Make more efficient with map/filter/reduce?
-	var names []string
-	for _, char := range w.Characters {
-		names = append(names, char.Name)
-	}
-	return names
 }
 
 func (w *World) GetCharacters() map[string]*character.Character {
@@ -73,20 +77,38 @@ func (w *World) ContainsCharacter(name string) bool {
 	return false
 }
 
-func (w *World) HandleCharacterJoined(c *character.Character) {
+func (w *World) AddCharacter(c *character.Character) {
 	w.Characters[c.Id] = c
-	c.World = w
-	w.Rooms["Bedroom"].AddCharacter(c)
+	w.BroadcastMessage(c.Name, fmt.Sprintf("%s entered the world.", c.Name))
+}
 
+func (w *World) RemoveCharacter(c *character.Character) {
+	delete(w.Characters, c.Id)
+	w.BroadcastMessage(c.Name, fmt.Sprintf("%s left the world.", c.Name))
+}
+
+func (w *World) HandleCharacterJoined(c *character.Character) {
+	// Update World
+	c.WorldId = w.Id
+	w.AddCharacter(c)
 	c.SendMessage(fmt.Sprintf("Welcome %s!", c.Name))
-	c.SendMessage("")
-	c.SendMessage(c.Room.GetDescription())
+
+	// Update Room
+	if c.RoomId == "" {
+		c.RoomId = "Bedroom" // Make const
+	}
+	r := w.Rooms[c.RoomId]
+	r.AddCharacter(c)
+	c.SendMessage(r.Description)
 }
 
 func (w *World) HandleCharacterLeft(c *character.Character) {
-	room := w.Rooms[c.Room.GetId()]
-	room.RemoveCharacter(c)
-	delete(w.Characters, c.Id)
+	// Update Room
+	r := w.Rooms[c.RoomId]
+	r.RemoveCharacter(c)
+
+	// Update World
+	w.RemoveCharacter(c)
 }
 
 func (w *World) HandleCharacterInput(char *character.Character, inp string) {
@@ -100,11 +122,11 @@ func (w *World) HandleCharacterInput(char *character.Character, inp string) {
 	case SHOUT:
 		w.Commands[SHOUT].Shout(char, args)
 	case TELL:
-		Tell(char, args)
+		w.Commands[TELL].Tell(char, args)
 	case WAVE:
 		w.Commands[WAVE].Wave(char, args)
 	case WHO:
-		Who(char, args)
+		w.Commands[WHO].Who(char, args)
 	}
 }
 

@@ -8,6 +8,8 @@ Performing actions prompts stories to progress and potentially being a trigger f
 
 But effectively, you can freeze time on stories, wander around, do other things. Progress and Nurture?
 
+Commands and CommandSets applied to a World by a Character. Characters have Commands, Worlds have AvailableCommands.
+
 Quest: Level, Tasks, Goals, Rewards
 Currency: Gil, Tokens
 Long Walkway -> Enter Context (Room)

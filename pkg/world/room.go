@@ -21,23 +21,6 @@ func NewRoom(id, desc string) *Room {
 	}
 }
 
-func (r *Room) GetId() string {
-	return r.Id
-}
-
-func (r *Room) GetDescription() string {
-	return r.Description
-}
-
-func (r *Room) GetCharacterNames() []string {
-	// TODO: Make more efficient with map/filter/reduce?
-	var names []string
-	for _, char := range r.Characters {
-		names = append(names, char.Name)
-	}
-	return names
-}
-
 func (r *Room) BroadcastMessage(speaker, msg string) {
 	for _, char := range r.Characters {
 		if char.Name != speaker {
@@ -57,12 +40,10 @@ func (r *Room) ContainsCharacter(name string) bool {
 
 func (r *Room) AddCharacter(c *character.Character) {
 	r.Characters[c.Id] = c
-	c.Room = r
 	r.BroadcastMessage(c.Name, fmt.Sprintf("%s entered the room.", c.Name))
 }
 
 func (r *Room) RemoveCharacter(c *character.Character) {
 	delete(r.Characters, c.Id)
-	c.Room = nil
 	r.BroadcastMessage(c.Name, fmt.Sprintf("%s left the room.", c.Name))
 }

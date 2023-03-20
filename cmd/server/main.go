@@ -10,7 +10,7 @@ import (
 
 func main() {
 	// Create and initialize world
-	w := world.New()
+	w := world.New("Prototype")
 	w.Load()
 
 	// Create a channel to receive session events
@@ -26,7 +26,7 @@ func main() {
 	// - Announce messages by creating message events
 	// Translate inputs into Events
 	// Disconnect connections
-	if err := server.Run(sessionEventChannel); err != nil {
+	if err := server.Run(sessionEventChannel, w.Id); err != nil {
 		log.Fatal(err)
 	}
 }
