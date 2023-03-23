@@ -7,6 +7,7 @@ import (
 	"github.com/Arugulamoon/gomud/pkg/character"
 )
 
+// Commands
 const GOTO = "goto"
 const SAY = "say"
 const SHOUT = "shout"
@@ -14,13 +15,8 @@ const TELL = "tell"
 const WAVE = "wave"
 const WHO = "who"
 
-type command interface {
-	Perform(char *character.Character, args string)
-}
-
 type World struct {
 	Id         string
-	Commands   map[string]*command
 	Rooms      map[string]*Room
 	Characters map[string]*character.Character
 }
@@ -28,22 +24,12 @@ type World struct {
 func New(id string) *World {
 	return &World{
 		Id:         id,
-		Commands:   make(map[string]*command),
 		Rooms:      make(map[string]*Room),
 		Characters: make(map[string]*character.Character),
 	}
 }
 
 func (w *World) Load() {
-	w.Commands = map[string]*command{
-		"goto":  {w},
-		"say":   {w},
-		"shout": {w},
-		"tell":  {w},
-		"wave":  {w},
-		"who":   {w},
-	}
-
 	bedroom := NewRoom("Bedroom", "You have entered your bedroom. There is a door leading out! (type \"/goto Hallway\" to leave the bedroom)")
 	hallway := NewRoom("Hallway", "You have entered a hallway with doors at either end. (type \"/goto LivingRoom\" to enter the living room or \"/goto Bedroom\" to enter the bedroom)")
 	livingRoom := NewRoom("LivingRoom", "You have entered the living room. (type \"/goto Hallway\" to enter the hallway)")
@@ -116,17 +102,17 @@ func (w *World) HandleCharacterInput(char *character.Character, inp string) {
 
 	switch cmd {
 	case GOTO:
-		w.Commands[GOTO].GoTo(char, args)
+		w.goTo(char, args)
 	case SAY:
-		w.Commands[SAY].Say(char, args)
+		w.say(char, args)
 	case SHOUT:
-		w.Commands[SHOUT].Shout(char, args)
+		w.shout(char, args)
 	case TELL:
-		w.Commands[TELL].Tell(char, args)
+		w.tell(char, args)
 	case WAVE:
-		w.Commands[WAVE].Wave(char, args)
+		w.wave(char, args)
 	case WHO:
-		w.Commands[WHO].Who(char, args)
+		w.who(char, args)
 	}
 }
 
@@ -137,4 +123,87 @@ func splitCommandAndArgs(c *character.Character, input string) (string, string) 
 		cmd, args, _ = strings.Cut(input, " ")
 	}
 	return cmd[1:], args
+}
+
+func (w *World) goTo(char *character.Character, targRoomId string) {
+	currRoom := w.Rooms[char.RoomId]
+	targRoom := currRoom.Links[targRoomId]
+	if targRoom == nil {
+		char.SendMessage("There is no one around with that name...")
+	} else {
+		currRoom.RemoveCharacter(char)
+		targRoom.AddCharacter(char)
+		char.RoomId = targRoom.Id
+		char.SendMessage(targRoom.Description)
+	}
+}
+
+func (w *World) say(char *character.Character, msg string) {
+	if msg == "" {
+		char.SendMessage("Cannot send empty message...")
+	} else {
+		char.SendMessage(fmt.Sprintf("You say, \"%s\"", msg))
+		room := w.Rooms[char.RoomId]
+		room.BroadcastMessage(char.Name, fmt.Sprintf("%s said, \"%s\"", char.Name, msg))
+	}
+}
+
+func (w *World) shout(char *character.Character, msg string) {
+	if msg == "" {
+		char.SendMessage("Cannot send empty message...")
+	} else {
+		char.SendMessage(fmt.Sprintf("You shout, \"%s\"", msg))
+		w.BroadcastMessage(char.Name, fmt.Sprintf("%s shouted, \"%s\"", char.Name, msg))
+	}
+}
+
+func (w *World) tell(char *character.Character, args string) {
+	if args != "" {
+		targetName, msg, _ := strings.Cut(args, " ")
+		if msg != "" {
+			if w.ContainsCharacter(targetName) {
+				target := w.GetCharacters()[targetName]
+				char.SendMessage(fmt.Sprintf("You tell %s, \"%s\"", target.Name, msg))
+				target.SendMessage(fmt.Sprintf("%s tells you, \"%s\"", char.Name, msg))
+			} else {
+				char.SendMessage("There is no one around with that name...")
+			}
+		} else {
+			char.SendMessage("Cannot send empty message...")
+		}
+	} else {
+		char.SendMessage("Cannot send empty target and message...")
+	}
+}
+
+func (w *World) wave(char *character.Character, args string) {
+	room := w.Rooms[char.RoomId]
+	if args != "" {
+		if room.ContainsCharacter(args) {
+			char.SendMessage(fmt.Sprintf("You wave at %s.", args))
+			room.BroadcastMessage(char.Name, fmt.Sprintf("%s waved at %s.", char.Name, args))
+		} else {
+			char.SendMessage("There is no one around with that name...")
+		}
+	} else {
+		char.SendMessage("You wave.")
+		room.BroadcastMessage(char.Name, fmt.Sprintf("%s waved.", char.Name))
+	}
+}
+
+func (w *World) who(char *character.Character, args string) {
+	room := w.Rooms[char.RoomId]
+	if args != "" {
+		if args == "all" {
+			char.SendMessage("/who all:")
+			for _, name := range w.Characters {
+				char.SendMessage(fmt.Sprintf("  %s", name))
+			}
+		}
+	} else {
+		char.SendMessage("/who:")
+		for _, name := range room.Characters {
+			char.SendMessage(fmt.Sprintf("  %s", name))
+		}
+	}
 }
