@@ -21,6 +21,8 @@ func New(s session) *Character {
 		Id:      generateId(),
 		Name:    generateName(),
 		Session: s,
+		WorldId: "Prototype",
+		RoomId:  "Bedroom",
 		Items:   make([]string, 0),
 	}
 }
