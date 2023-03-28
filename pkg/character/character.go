@@ -13,6 +13,7 @@ type Character struct {
 	Id, Name        string
 	Session         session
 	WorldId, RoomId string
+	Items           []string
 }
 
 func New(s session) *Character {
@@ -20,11 +21,18 @@ func New(s session) *Character {
 		Id:      generateId(),
 		Name:    generateName(),
 		Session: s,
+		Items:   make([]string, 0),
 	}
 }
 
 func (c *Character) SendMessage(msg string) {
 	c.Session.WriteLine(msg)
+}
+
+func (c *Character) PickUp(itemId string) error {
+	c.Items = append(c.Items, itemId)
+	c.SendMessage(fmt.Sprintf("You pick up %s.", itemId))
+	return nil
 }
 
 var nextId = 1

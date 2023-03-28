@@ -1,6 +1,10 @@
 package world
 
-import "github.com/Arugulamoon/gomud/pkg/session"
+import (
+	"log"
+
+	"github.com/Arugulamoon/gomud/pkg/session"
+)
 
 type SessionHandler struct {
 	World        *World
@@ -18,16 +22,21 @@ func (h *SessionHandler) Start() {
 	for sessionEvent := range h.EventChannel {
 		c := sessionEvent.Session.Character
 
+		var err error
 		switch event := sessionEvent.Event.(type) {
 
 		case *session.SessionCreateEvent:
-			h.World.HandleCharacterJoined(c)
+			err = h.World.HandleCharacterJoined(c)
 
 		case *session.SessionDisconnectEvent:
-			h.World.HandleCharacterLeft(c)
+			err = h.World.HandleCharacterLeft(c)
 
 		case *session.SessionInputEvent:
-			h.World.HandleCharacterInput(c, event.Input)
+			err = h.World.HandleCharacterInput(c, event.Input)
+		}
+
+		if err != nil {
+			log.Fatalln(err)
 		}
 	}
 }
