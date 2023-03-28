@@ -31,6 +31,19 @@ func (c *Character) SendMessage(msg string) {
 	c.Session.WriteLine(msg)
 }
 
+// Available User Commands
+const CHAR = "char"
+
+func (c *Character) Char() {
+	c.SendMessage(c.Name)
+	if len(c.Items) > 0 {
+		c.SendMessage("Items:")
+		for _, item := range c.Items {
+			c.SendMessage(fmt.Sprintf("  %s", item))
+		}
+	}
+}
+
 func (c *Character) PickUp(itemId string) error {
 	c.Items = append(c.Items, itemId)
 	c.SendMessage(fmt.Sprintf("You pick up %s.", itemId))

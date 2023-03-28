@@ -82,6 +82,10 @@ func (h *SessionHandler) handleCharacterInput(char *character.Character, inp str
 		r := h.World.Rooms[char.RoomId]
 		err = r.Wave(char, args)
 
+		// Character
+	case character.CHAR:
+		char.Char()
+
 	}
 
 	if err != nil {
