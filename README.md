@@ -1,6 +1,6 @@
 # gomud
 
-Proof of concept MUD (multi-user dungeon) in golang using sockets and TLS certs. References listed to put it together.
+Prototype MUD (multi-user dungeon) in golang using channels and TLS certs. References listed to put it together.
 
 Start the server in one terminal window; start up additional clients in separate terminals; clients enter commands to move from a room to another; interact by waving etc
 
