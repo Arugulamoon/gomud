@@ -33,7 +33,7 @@ openssl req \
   -out ca.crt
 ```
 
-On Windows Git Bash (slashes changed):
+On Windows Git Bash (difference in slashes):
 ```bash
 openssl req -new -x509 -days 3650 -key ca.key -subj "//C=CA\ST=ON\L=Ottawa\O=Eden-Walker\CN=Eden-Walker Root CA" -out ca.crt
 ```
@@ -46,6 +46,11 @@ openssl req \
   -keyout server.key \
   -subj "/C=CA/ST=ON/L=Ottawa/O=Eden-Walker/CN=localhost" \
   -out server.csr
+```
+
+On Windows Git Bash (difference in slashes):
+```bash
+openssl req -newkey rsa:2048 -nodes -keyout server.key -subj "//C=CA\ST=ON\L=Ottawa\O=Eden-Walker\CN=localhost" -out server.csr
 ```
 
 ### Finally sign server cert by CA and pass the subjectAltName when you signing server cert
