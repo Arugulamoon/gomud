@@ -1,25 +1,62 @@
 # gomud
 
-Quest: Level, Tasks, Goals, Rewards
-Currency: Coins, Tokens
-Long Walkway -> Enter Context (Room)
+Proof of concept MUD (multi-user dungeon) in golang using sockets and TLS certs. References listed to put it together.
 
-## Server Terminal
+Start the server in one terminal window; start up additional clients in separate terminals; clients enter commands to move from a room to another; interact by waving etc
+
+## Sample Output
+
+### Server Terminal
 ```bash
-go run cmd/server/main.go
+$ go run ./cmd/server/main.go
+2024/10/18 14:35:07 Starting async tcp server to receive messages
+2024/10/18 14:36:05 Server accepted connection and created session: 1
+2024/10/18 14:36:23 Received message on session 1: /goto Hallway
+2024/10/18 14:37:02 Server accepted connection and created session: 2
+2024/10/18 14:37:14 Received message on session 2: /goto LivingRoom
+2024/10/18 14:37:14 target room not found
+2024/10/18 14:37:24 Received message on session 2: /goto Hallway
+2024/10/18 14:37:35 Received message on session 2: /goto LivingRoom
+2024/10/18 14:37:41 Error handling connection read tcp [::1]:7324->[::1]:52099: wsarecv: An existing con
+nection was forcibly closed by the remote host.
 ```
 
-## Client Terminal
+### Client 1 Terminal
 ```bash
-go run cmd/client/main.go
+$ go run ./cmd/client/main.go
+You have entered your bedroom. There is a door leading out! (type "/goto Hallway
+" to leave the bedroom)
+Items:
+  Book
+Welcome Character 27!
+/goto Hallway
+You have entered a hallway with doors at either end. (type "/goto LivingRoom" to
+ enter the living room or "/goto Bedroom" to enter the bedroom)
+Character 2 entered the world.
+Character 2 entered the room.
+Character 2 left the room.
+Character 2 left the world.
 ```
 
-## Alternative Client Terminal
+### Client 2 Terminal
 ```bash
-openssl s_client -connect localhost:7324
+$ go run ./cmd/client/main.go
+You have entered your bedroom. There is a door leading out! (type "/goto Hallway
+" to leave the bedroom)
+Items:
+  Book
+Welcome Character 2!
+/goto LivingRoom
+There is no one around with that name...
+/goto Hallway
+You have entered a hallway with doors at either end. (type "/goto LivingRoom" to
+ enter the living room or "/goto Bedroom" to enter the bedroom)
+/goto LivingRoom
+You have entered the living room. (type "/goto Hallway" to enter the hallway)
+exit status 0xc000013a
 ```
 
-## Generate Self-Signed SSL Certificate
+## Setup: Generate Self-Signed SSL Certificate
 
 ### You must have a CA
 ```bash
@@ -72,7 +109,24 @@ echo subjectAltName=DNS:localhost > openssl.cnf
 openssl x509 -req -extfile openssl.cnf -days 3650 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt
 ```
 
-### References:
+## Run
+
+### Server Terminal
+```bash
+go run cmd/server/main.go
+```
+
+### Client Terminal
+```bash
+go run cmd/client/main.go
+```
+
+### Alternative Client Terminal
+```bash
+openssl s_client -connect localhost:7324
+```
+
+## References:
 * https://github.com/shuklalok/Mywork/tree/master/tls
 * https://gist.github.com/denji/12b3a568f092ab951456
 * https://superuser.com/questions/346958/can-the-telnet-or-netcat-clients-communicate-over-ssl
