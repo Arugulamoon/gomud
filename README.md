@@ -33,6 +33,11 @@ openssl req \
   -out ca.crt
 ```
 
+On Windows Git Bash (slashes changed):
+```bash
+openssl req -new -x509 -days 3650 -key ca.key -subj "//C=CA\ST=ON\L=Ottawa\O=Eden-Walker\CN=Eden-Walker Root CA" -out ca.crt
+```
+
 ### Create a server CSR with 'localhost' in CN
 ```bash
 openssl req \
