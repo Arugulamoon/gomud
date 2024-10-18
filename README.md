@@ -66,6 +66,12 @@ openssl x509 \
   -out server.crt
 ```
 
+On Windows Git Bash (issue with printf command):
+```bash
+echo subjectAltName=DNS:localhost > openssl.cnf
+openssl x509 -req -extfile openssl.cnf -days 3650 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt
+```
+
 ### References:
 * https://github.com/shuklalok/Mywork/tree/master/tls
 * https://gist.github.com/denji/12b3a568f092ab951456
