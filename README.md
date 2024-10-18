@@ -1,17 +1,7 @@
 # gomud
 
-Home is a center. Taturo does not go on missions, but she goes with the group to Far East. Moving base. Home. Center.
-
-Being in the world is moving along main storyline, sidequests. All the while progressing through alternating sequences of witnessing something occuring, story, and performing actions. actions that effect change in the context.
-
-Performing actions prompts stories to progress and potentially being a trigger for another story. Which has a beginning and an end. 
-
-But effectively, you can freeze time on stories, wander around, do other things. Progress and Nurture?
-
-Commands and CommandSets applied to a World by a Character. Characters have Commands, Worlds have AvailableCommands.
-
 Quest: Level, Tasks, Goals, Rewards
-Currency: Gil, Tokens
+Currency: Coins, Tokens
 Long Walkway -> Enter Context (Room)
 
 ## Server Terminal
